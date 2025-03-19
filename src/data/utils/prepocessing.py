@@ -1,34 +1,29 @@
 import numpy as np
+import VoiceSample
 
+class Preemphasis(VoiceSample):
+    """Pre-emphasis filter applied to a VoiceSample."""
 
-class Preemphasis(object):
-    """Class implementing preemphasis"""
+    def __init__(self, x: np.ndarray, fs: int, alpha=0.94):
+        """Apply pre-emphasis and store result."""
+        x_preem = np.append(x[0], x[1:] - alpha * x[:-1])
+        super().__init__(x_preem, fs)  # Initialize parent class
 
-    def __init__(self, xpreem: np.ndarray, fs: int):
-        self.xpreem = xpreem
-        self. fs = fs
     @classmethod
-    def calculate_preemphasis(cls, voice_sampe, alpha = 0.94):
-         """Apply pre-emphasis to a VoiceSample instance."""
-         x= voice_sampe.get_waveform()
-         fs= voice_sampe.get_sampling_rate()
-
-         xpreem = np.append(x[0], x[1:] - alpha[:-1])
-         return cls(xpreem)
+    def from_voice_sample(cls, voice_sample, alpha=0.94):
+        """Create a Preemphasis object from a VoiceSample."""
+        return cls(voice_sample.get_waveform(), voice_sample.get_sampling_rate(), alpha)
 
 
-class SignalNormalization(object):
-    """Class implementing signal normalization"""
+class SignalNormalization(VoiceSample):
+    """Normalize a VoiceSample."""
 
-    def __init__(self, xnorm: np.ndarray, fs: int):
-        self.xnorm = xnorm
-        self.fs = fs
+    def __init__(self, x: np.ndarray, fs: int):
+        """Normalize the waveform and store the result."""
+        x_norm = x / np.max(np.abs(x)) if np.max(np.abs(x)) > 0 else x
+        super().__init__(x_norm, fs)  # Initialize parent class
+
     @classmethod
-    def calculate_normalization(cls, voice_sample):
-        """Normalize a VoiceSample instance to the range [-1, 1]."""
-        x = voice_sample.get_waveform()
-        fs = voice_sample.get_sampling_rate()
-        # Normalize signal: x_norm = x / max(|x|)
-        xnorm = x / np.max(np.abs(x)) if np.max(np.abs(x)) > 0 else x
-
-        return cls(xnorm, fs)
+    def from_voice_sample(cls, voice_sample):
+        """Create a normalized VoiceSample from an existing one."""
+        return cls(voice_sample.get_waveform(), voice_sample.get_sampling_rate())
