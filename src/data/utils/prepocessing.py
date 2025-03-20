@@ -29,3 +29,4 @@ class SignalNormalization(object):
         return cls(voice_sample.get_waveform(), voice_sample.get_sampling_rate())
 
     #TODO: Add segmentation function 
+    #TODO: Add denoising function 
