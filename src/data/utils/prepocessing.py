@@ -1,7 +1,7 @@
 import numpy as np
-import VoiceSample
+#import VoiceSample
 
-class Preemphasis(VoiceSample):
+class Preemphasis(object):
     """Pre-emphasis filter applied to a VoiceSample."""
 
     def __init__(self, x: np.ndarray, fs: int, alpha=0.94):
@@ -15,7 +15,7 @@ class Preemphasis(VoiceSample):
         return cls(voice_sample.get_waveform(), voice_sample.get_sampling_rate(), alpha)
 
 
-class SignalNormalization(VoiceSample):
+class SignalNormalization(object):
     """Normalize a VoiceSample."""
 
     def __init__(self, x: np.ndarray, fs: int):
@@ -27,3 +27,5 @@ class SignalNormalization(VoiceSample):
     def from_voice_sample(cls, voice_sample):
         """Create a normalized VoiceSample from an existing one."""
         return cls(voice_sample.get_waveform(), voice_sample.get_sampling_rate())
+
+    #TODO: Add segmentation function 

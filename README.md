@@ -1,5 +1,5 @@
 # VuVoPy
 
-## Python installable package
+## VUT Voice Python installable package
 
 Whole README will be added later

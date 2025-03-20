@@ -16,7 +16,7 @@ class FundamentalFrequency:
         - dERBs  : Frequency resolution in ERBs
         - sTHR   : Pitch strength threshold
         """
-        if not isinstance(sample, VoiceSample):
+        if not isinstance(sample, object):
             raise TypeError("Input must be an instance of VoiceSample or its derived classes.")
 
         self.x = sample.get_waveform()

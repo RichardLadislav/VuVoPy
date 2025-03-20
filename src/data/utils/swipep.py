@@ -7,7 +7,7 @@ import sympy as sym
 from scipy.interpolate import interp1d
 from scipy.signal import spectrogram
 import librosa 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline
 import os
 # Check i  f 'plim' exists and is not None or empty, else set default value
