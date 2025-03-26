@@ -26,13 +26,13 @@ class Preprocessed(VoiceSample):
 
 
     def get_preemphasis(self, alpha = None):
-        """Return the waveform as a NumPy array."""
+        """Return the waveform  with applied pre-emphasis as a NumPy array."""
         if alpha is None:
             return self.preem
         return np.append(self.x[0], self.x[1:] - alpha * self.x[:-1])
 
     def get_normalization(self):
-        """Return the waveform as a NumPy array."""
+        """Return the normalized waveform as a NumPy array."""
         return self.xnorm
 
     def get_waveform(self):
