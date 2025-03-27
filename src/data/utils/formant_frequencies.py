@@ -6,7 +6,7 @@ from containers.segmentation import Segmentred
 class FormantFrequencies(Segmentred):
     '''Class to compute F1 and F2 frormant frequencies'''
     def __init__(self, x, fs, xnorm, preem, xsegment, winlen, wintype, winover, formants, alpha=0.94):
-        super().__init__(self, x, fs, xnorm, preem, xsegment, winlen, wintype, winover, alpha=0.94)
+        super().__init__(x, fs, xnorm, preem, xsegment, winlen, wintype, winover, alpha=0.94)
         self.formants = formants
     @classmethod
     def from_voice_sample(cls, segments):
@@ -15,27 +15,27 @@ class FormantFrequencies(Segmentred):
         seg_x_norm = segments.get_norm_segment()
         fs = segments.get_sampling_rate() 
         
-        order = np.fix(fs/1000 +2)
+        order = int(np.fix(fs/1000 +2))
 
-        lpc_coeff_x = lb.lpc(seg_x, order=order)
-        lpc_coeff_x_prem = lb.lpc(seg_x_preem ,order=order)
-        lpc_coeff_x_norm = lb.lpc(seg_x_norm, order=order)
+        lpc_coeff_x = lb.lpc(seg_x, order)
+        lpc_coeff_x_prem = lb.lpc(seg_x_preem ,order)
+        lpc_coeff_x_norm = lb.lpc(seg_x_norm, order)
         
-        N = np.shape(lpc_coeff_x,0)
+        N = lpc_coeff_x.shape[0]
 
         formants = np.zeros((N,3,3))
         #TODO: Zatial len formantu, sirka pasem mozno potom,
         
         for i in range(N):
             #Findiung roots of nominator of transfer function
-            rts_x = np.roots(lpc_coeff_x[:,i])
-            rts_x_preem = np.roots(lpc_coeff_x_prem[:,i])
-            rts_x_norm = np.roots(lpc_coeff_x_norm[:,i])
+            rts_x = np.roots(lpc_coeff_x)
+            rts_x_preem = np.roots(lpc_coeff_x_prem)
+            rts_x_norm = np.roots(lpc_coeff_x_norm)
             
             #Finding non-zero Im{Z} >=0
-            rts_x = rts_x[(np.imag(rts_x)>=0 )].copy
-            rts_x_preem = rts_x_preem[(np.imag(rts_x)>=0 )].copy
-            rts_x_norm = rts_x_norm[(np.imag(rts_x)>=0 )].copy
+            rts_x = rts_x[(np.imag(rts_x)>=0 )].copy()
+            rts_x_preem = rts_x_preem[(np.imag(rts_x)>=0 )].copy()
+            rts_x_norm = rts_x_norm[(np.imag(rts_x)>=0 )].copy()
 
             #Finding formants
             tempF_x = np.arctan2(np.imag(rts_x),np.real(rts_x))
@@ -47,18 +47,20 @@ class FormantFrequencies(Segmentred):
             sort_F_preem = sorted(tempF_x_preem)
             sort_F_norm = sorted(tempF_x_preem)
             
-            formants[:,:,0] =  sort_F
-            formants[:,:,1] =  sort_F_preem
-            formants[:,:,2] =  sort_F_norm
+            formants[i,:,0] =  sort_F[0,2]
+            formants[i,:,1] =  sort_F_preem[0,2]
+            formants[i,:,2] =  sort_F_norm[0,2]
             
             return cls(fs, formants)
         
     def get_formants(self):
         """Return the numpy array of formants extracted from raw waveform"""
         return self.formants[:,:,0]
+
     def get_formants_preem(self):
         """Return the numpy array of formants extracted from pre-emphasis waveform"""
         return self.formants[:,:,1]
+    
     
     def get_formants_norm(self):
         """Return the numpy array of formants extracted from normalized waveform"""
