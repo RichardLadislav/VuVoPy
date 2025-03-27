@@ -1,6 +1,6 @@
 import numpy as np
 import librosa
-
+import swipep
 class FundamentalFrequency:
     """Class to compute F0 pitch using the SWIPE' algorithm."""
 
