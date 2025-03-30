@@ -8,8 +8,8 @@ from data.containers.segmentation import Segmented
 
 class FormantFrequencies(Segmented):
     '''Class to compute F1 and F2 frormant frequencies'''
-    def __init__(self, x, fs, xnorm, preem, xsegment, winlen, wintype, winover, formants, alpha=0.94):
-        super().__init__(x, fs, xnorm, preem, xsegment, winlen, wintype, winover, alpha=0.94)
+    def __init__(self, fs, formants):
+        super().__init__(None, fs, None, None, None, None, None, None, None)
         self.formants = formants
     @classmethod
     def from_voice_sample(cls, segments):
@@ -42,18 +42,21 @@ class FormantFrequencies(Segmented):
         N = lpc_coeff_x.shape[0]
 
         formants = np.zeros((N,3,3))
+        rts_x = np.zeros((N,3))
+        rts_x_preem = np.zeros((N,3))
+        rts_x_norm= np.zeros((N,3))
         #TODO: Zatial len formantu, sirka pasem mozno potom,
         
         for i in range(N):
             #Findiung roots of nominator of transfer function
-            rts_x = np.roots(lpc_coeff_x)
-            rts_x_preem = np.roots(lpc_coeff_x_prem)
-            rts_x_norm = np.roots(lpc_coeff_x_norm)
+            rts_x = np.roots(lpc_coeff_x[i,:])
+            rts_x_preem = np.roots(lpc_coeff_x_prem[i,:])
+            rts_x_norm = np.roots(lpc_coeff_x_norm[i,:])
             
             #Finding non-zero Im{Z} >=0
-            rts_x = rts_x[(np.imag(rts_x)>=0 )].copy()
-            rts_x_preem = rts_x_preem[(np.imag(rts_x)>=0 )].copy()
-            rts_x_norm = rts_x_norm[(np.imag(rts_x)>=0 )].copy()
+            rts_x = rts_x[(np.imag(rts_x)>0 )].copy()
+            rts_x_preem = rts_x_preem[(np.imag(rts_x_preem)>0 )].copy()
+            rts_x_norm = rts_x_norm[(np.imag(rts_x_norm)>0 )].copy()
 
             #Finding formants
             tempF_x = np.arctan2(np.imag(rts_x),np.real(rts_x))
@@ -63,14 +66,39 @@ class FormantFrequencies(Segmented):
             #Sorting formants
             sort_F = sorted(tempF_x)
             sort_F_preem = sorted(tempF_x_preem)
-            sort_F_norm = sorted(tempF_x_preem)
+            sort_F_norm = sorted(tempF_x_norm)
             
-            formants[i,:,0] =  sort_F[0,2]
-            formants[i,:,1] =  sort_F_preem[0,2]
-            formants[i,:,2] =  sort_F_norm[0,2]
+            #formants[i, 0, 0] = sort_F[0]  # First formant (F1)
+            #formants[i, 1, 0] = sort_F[1]  # Second formant (F2)
+            #formants[i, 2, 0] = sort_F[2]  # Third formant (F3)
+
+            #formants[i, 0, 1] = sort_F_preem[0]
+            #formants[i, 1, 1] = sort_F_preem[1]
+            #formants[i, 2, 1] = sort_F_preem[2]
+
+            #formants[i, 0, 2] = sort_F_norm[0]
+            #formants[i, 1, 2] = sort_F_norm[1]
+            #formants[i, 2, 2] = sort_F_norm[2]
             #TODO: Bandwidths of formants are not calculated yet
+            if sort_F == []:    
+                sort_F = np.zeros(3)
+                sort_F_preem = np.zeros(3)
+                sort_F_norm = np.zeros(3)
+
+            formants[i, 0, 0] = np.real(sort_F[0]) * (fs / (2 * np.pi))  # F1   
+            formants[i, 1, 0] = np.real(sort_F[1]) * (fs / (2 * np.pi))
+            formants[i, 2, 0] = np.real(sort_F[2]) * (fs / (2 * np.pi)) # F3
             
-            return cls(fs, formants)
+            
+            formants[i, 0, 1] = np.real(sort_F_preem[0]) * (fs / (2 * np.pi))  # F1   
+            formants[i, 1, 1] = np.real(sort_F_preem[1]) * (fs / (2 * np.pi))
+            formants[i, 2, 1] = np.real(sort_F_preem[2]) * (fs / (2 * np.pi)) # F3
+            
+            formants[i, 0, 2] = np.real(sort_F_norm[0]) * (fs / (2 * np.pi))  # F1   
+            formants[i, 1, 2] = np.real(sort_F_norm[1]) * (fs / (2 * np.pi))
+            formants[i, 2, 2] = np.real(sort_F_norm[2]) * (fs / (2 * np.pi)) # F3
+            formants = formants.copy()
+        return cls(fs, formants)
         
     def get_formants(self):
         """Return the numpy array of formants extracted from raw waveform"""
@@ -102,10 +130,12 @@ def main():
     #seg_wave = seg.get_segment(winlen=512, wintype="hann", winover=256)
     #seg_preem = seg.get_preem_segment(winlen=512, wintype="blackman", winover=256)
     #seg_norm = seg.get_norm_segment(winlen=512, wintype="square", winover=256)
-
+    dt = formants_preem.shape[0] / formants.get_sampling_rate() # Time step for analysis (seconds)
+    # Time vector for each window
+    time_vector = np.arange(0, len(formants_preem) * dt, dt)[:formants_preem.shape[0]]
     plt.figure(figsize=(10, 6))
-    for i in range(formants_preem.shape[1]):  # Iterate over formant frequency columns
-        plt.scatter( formants_preem[:, i], label=f'Formant {i}',marker="x")
+    for i in range(formants_xnormm.shape[1]):  # Iterate over formant frequency columns
+        plt.scatter(time_vector,formants_x[:, i], label=f'Formant {i}',marker="x")
 
     plt.title("Formant Frequencies Over Time")
     plt.xlabel("Time (s)")
