@@ -1,6 +1,6 @@
 import numpy as np
-from sample import VoiceSample
-from prepocessing import Preprocessed  # Fixed typo in import
+from .sample import VoiceSample
+from .prepocessing import Preprocessed  # Fixed typo in import
 #TODO  prepisat typo v preprocessing
 
 class Segmented(Preprocessed):  # Fixed typo in class name
@@ -60,15 +60,15 @@ class Segmented(Preprocessed):  # Fixed typo in class name
 
     
 
-    def get_segment(self, winlen, wintype, winover):
+    def get_segment(self):
         """Return the waveform as a NumPy array."""
         return self.xsegment[:,:,0]
 
-    def get_preem_segment(self, winlen, wintype, winover):
+    def get_preem_segment(self):
         """Return the waveform as a NumPy array."""
         return self.xsegment[:,:,1]
 
-    def get_norm_segment(self, winlen, wintype, winover):
+    def get_norm_segment(self):
         """Return the waveform as a NumPy array."""
         return self.xsegment[:,:,2]
 

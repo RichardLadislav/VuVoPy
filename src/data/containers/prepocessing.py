@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sample import VoiceSample
+from .sample import VoiceSample
 
 class Preprocessed(VoiceSample):
     """Preprocessing applied to VoiceSample"""

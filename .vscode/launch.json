@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run segm${fileExtname}.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/data/utils/formant_frequencies.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src"
+            }
+        }
+    ]
+}
