@@ -68,17 +68,6 @@ class FormantFrequencies(Segmented):
             sort_F_preem = sorted(tempF_x_preem)
             sort_F_norm = sorted(tempF_x_norm)
             
-            #formants[i, 0, 0] = sort_F[0]  # First formant (F1)
-            #formants[i, 1, 0] = sort_F[1]  # Second formant (F2)
-            #formants[i, 2, 0] = sort_F[2]  # Third formant (F3)
-
-            #formants[i, 0, 1] = sort_F_preem[0]
-            #formants[i, 1, 1] = sort_F_preem[1]
-            #formants[i, 2, 1] = sort_F_preem[2]
-
-            #formants[i, 0, 2] = sort_F_norm[0]
-            #formants[i, 1, 2] = sort_F_norm[1]
-            #formants[i, 2, 2] = sort_F_norm[2]
             #TODO: Bandwidths of formants are not calculated yet
             if sort_F == []:    
                 sort_F = np.zeros(3)
@@ -146,11 +135,3 @@ def main():
     print("holap")
 if __name__ == "__main__": 
     main()
-
-
-            
-
-        
-        
-        
-
