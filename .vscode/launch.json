@@ -5,7 +5,7 @@
             "name": "Run segm${fileExtname}.py",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/src/data/utils/formant_frequencies.py",
+            "program": "${workspaceFolder}/src/features/utils/relF12SD.py",
             "console": "integratedTerminal",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/src"
