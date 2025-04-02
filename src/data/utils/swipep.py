@@ -5,7 +5,8 @@ from scipy.signal import spectrogram
 from scipy.interpolate import CubicSpline
 
 # Check i  f 'plim' exists and is not None or empty, else set default value
-def swipep(x,fs,plim,dt,dlog2p,dERBs,sTHR):
+def swipep(x,fs,plim,hop_size,dlog2p,dERBs,sTHR):
+    dt = hop_size / fs  # Time step for analysis (seconds)
     t =np.arange( 0, len(x)/fs, dt)# time vektor
     dc = 4 #Hop size 
     K = 2 #Parameter for size window
