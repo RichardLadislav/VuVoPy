@@ -16,7 +16,7 @@ def relF0SD(folder_path, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1,
     - sTHR        : float : Pitch strength threshold.
 
     Returns:
-    - float : Relative standard deviation of the fundamental frequency.
+    - float : Relative standard deviation of thefundamental frequency.
     """
     fundamental_freq = f0(vs.from_wav(folder_path), plim, hop_size, dlog2p, dERBs, sTHR)
     return np.mean(fundamental_freq.get_f0())/np.std(fundamental_freq.get_f0())
