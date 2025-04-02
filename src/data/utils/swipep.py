@@ -36,8 +36,6 @@ def swipep(x,fs,plim,hop_size,dlog2p,dERBs,sTHR):
         w = np.hanning(ws[i]) # Hanning window
         o = max(0, round(ws[i] - dn))
         f, ti, X = spectrogram(xzp, fs=fs, window=w, nperseg=ws[i], noverlap=o, mode='complex') 
-        #TOFIX: ??????????????????????? what<
-        #X = X *np.sum(w)#*10E12
         # Interpolate at eqidistant ERBs steps
         # Perform interpolation
         # TO DO: ferb je hodnota musim posilat poradi prvku v liste 
@@ -59,7 +57,6 @@ def swipep(x,fs,plim,hop_size,dlog2p,dERBs,sTHR):
         else:
              j = np.where(np.abs(d - i) < 1)[0]
              k = np.arange(len(j))   
-
 
         Si = pitchStrengthAllCandidates(fERBs, L, pc[j])
          # Pitch strength for selected candidates
