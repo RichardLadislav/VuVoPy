@@ -5,7 +5,7 @@
             "name": "Run segm${fileExtname}.py",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/src/data/utils/fundamental_frequency.py",
+            "program": "${workspaceFolder}/src/features/utils/relF0SD.py",
             "console": "integratedTerminal",
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/src"

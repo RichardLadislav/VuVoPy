@@ -53,7 +53,7 @@ class FundamentalFrequency:
 def main():
     """Main function to demonstrate the usage of FundamentalFrequency class."""
     folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
-    ff = FundamentalFrequency(VoiceSample.from_wav(folder_path),hop_size=128)
+    ff = FundamentalFrequency(VoiceSample.from_wav(folder_path),hop_size=127)
     f0 = ff.get_f0()
     time = ff.get_time()
     strength = ff.get_strength()
