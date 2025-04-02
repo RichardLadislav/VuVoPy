@@ -1,30 +1,21 @@
-import pandas as pd
 import numpy as np
-from scipy import io, integrate, linalg,  signal
-from scipy.sparse.linalg import cg, eigs
 import math as m
 import sympy as sym 
-from scipy.interpolate import interp1d
 from scipy.signal import spectrogram
-import librosa 
-#import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline
-import os
+
 # Check i  f 'plim' exists and is not None or empty, else set default value
 def swipep(x,fs,plim,dt,dlog2p,dERBs,sTHR):
-    
-    t =np.arange( 0, len(x)/fs, dt)#[:,np.newaxis]  time vektor
-
+    t =np.arange( 0, len(x)/fs, dt)# time vektor
     dc = 4 #Hop size 
     K = 2 #Parameter for size window
 
     #Define pitch candidates
-
     log2pc = np.arange(np.log2(plim[0]), np.log2(plim[1]), dlog2p).reshape(-1, 1) 
     pc = 2 ** log2pc
     S = np.zeros((len(pc),len(t))) # Pitch candidate strenght matrix
 
-    # Determine PW - WSs
+    # Determine P2 - WSs
     divFS = [fs / x for x in plim] #variable so I can divide by list
     logWs = [round(m.log2(4 * K * df)) for df in divFS]
     #ws_arg =  np.arange(logWs[0], logWs[1], -1)
@@ -34,17 +25,18 @@ def swipep(x,fs,plim,dt,dlog2p,dERBs,sTHR):
     # Determine window sizes used by each pitch candidate
     d =  1 + log2pc - m.log2(4*K*fs/ws[0])
     # Create ERBs spaced frequencies (in Hertz)
-    
     fERBs = erbs2hz(np.arange(hz2erbs(pc[0]/4), hz2erbs(fs/2),dERBs))[:,np.newaxis]
+
     for i in range(len(ws)):
-        dn = round(dc * fs / pO[0]) #Hop size in samples
+        dn = round(dc * fs / pO[i]) #Hop size in samples
         # Zero pad signal
         xzp = np.concatenate([np.zeros((ws[i]//2,)), x.flatten(), np.zeros((dn + ws[i]//2,))])
         # Compute spectrum
         w = np.hanning(ws[i]) # Hanning window
         o = max(0, round(ws[i] - dn))
         f, ti, X = spectrogram(xzp, fs=fs, window=w, nperseg=ws[i], noverlap=o, mode='complex') 
-        X = X *np.sum(w)#*10E12
+        #TOFIX: ??????????????????????? what<
+        #X = X *np.sum(w)#*10E12
         # Interpolate at eqidistant ERBs steps
         # Perform interpolation
         # TO DO: ferb je hodnota musim posilat poradi prvku v liste 
@@ -52,9 +44,7 @@ def swipep(x,fs,plim,dt,dlog2p,dERBs,sTHR):
         # Calculate the interpolated magnitudes
         M = np.maximum(0, interp_func(fERBs) )  # Ensure non-negative values
         M = np.squeeze(M)# 
-        #M = np.maximum(0, [interp_func(ferbs) for ferbs in fERBs] )  # Ensure non-negative values
 
-        #M = np.maximum(0, [interp_func(ferbs) for ferbs in range(fERBs.shape[0])] )  # Ensure non-negative values
         L = [np.sqrt(ms) for ms in M]# Loudness
         # Select candidates that use this window size 
         # Loop over window 
@@ -70,40 +60,23 @@ def swipep(x,fs,plim,dt,dlog2p,dERBs,sTHR):
              k = np.arange(len(j))   
 
 
-         # Pitch strength for selected candidates
         Si = pitchStrengthAllCandidates(fERBs, L, pc[j])
-
-
+         # Pitch strength for selected candidates
         # Interpolate at desired times
         if Si.shape[1] > 1:
-
            Si = np.nan_to_num(Si, nan=0.0, posinf=0.0, neginf=0.0)
            interp_func = CubicSpline(ti, Si.T, extrapolate = False)
-
-
            #Si = [interp_func(i) for i in t]
-
            Si = interp_func(t) 
-
-
-
         else:
            Si = np.full((len(Si), len(t)), np.nan)
-
-
         # Calculate lambda and mu for weighting
         lambda_ = d[j[k]] - i
-
         mu = np.ones(j.shape).T
-
         mu[k] = 1 - np.abs(lambda_.T)
-
         # Update pitch strength matrix
-
-        #help_dimensions= np.outer(mu.shape[0],np.ones(Si.shape[1]))*Si
         S[j, :] += np.outer(mu, np.ones(Si.T.shape[1])) * Si.T
         #S[j, :] += (mu * Si.T).T
-
     # Initialize pitch and strength ys with NaN
     p = np.full((S.shape[1], 1), np.nan)
     s = np.full((S.shape[1], 1), np.nan)
@@ -116,7 +89,6 @@ def swipep(x,fs,plim,dt,dlog2p,dERBs,sTHR):
         # Skip if the strength is below the threshold
         if s[j] < sTHR:
             continue
-    
         # Handle boundary cases
         if i == 0 or i == len(pc) - 1:
             p[j] = pc[0]
@@ -125,17 +97,13 @@ def swipep(x,fs,plim,dt,dlog2p,dERBs,sTHR):
             I = np.arange(i-1, i+2)  # Indices for 3-point interpolation
             tc = 1.0 / pc[I]  # Convert pitch candidates to periods
             ntc = (tc / tc[1] - 1) * 2 * np.pi  # Normalize periods
-        
             # Perform parabolic interpolation using polyfit
             S_help = S[I, j]
-            ntc_help = np.squeeze(ntc)
-            c = np.polyfit(np.squeeze(ntc), S_help, 2)
-        
+            c = np.polyfit(np.squeeze(ntc), S[I, j], 2)
             # Generate fine-tuned frequency candidates for interpolation
             ftc = 1.0 / 2.0**np.arange(np.log2(pc[I[0]]), np.log2(pc[I[2]]) + 1/12/64, 1/12/64)
             nftc = (ftc / tc[1] - 1) * 2 * np.pi  # Normalize fine-tuned candidates Use the interpolated polynomial to find the fine-tuned maximum
             s[j], k = np.max(np.polyval(c, nftc)), np.argmax(np.polyval(c, nftc))
-        
             # Convert the fine-tuned result back to pitch
             p[j] = 2 ** (np.log2(pc[I[0]]) + (k - 1) / (12 * 64))
     return p, t, s
@@ -153,17 +121,11 @@ def pitchStrengthAllCandidates(f,L,pc):
     Returns:
     S  -- Pitch salience matrix
     """
-    #print(f"f: {f}") 
-    #print(f"pc: {pc}")
-    #print(f"L: {L}")
-    
     with np.errstate(divide= 'ignore', invalid = 'ignore'):
-     
         L =  np.array(L)
         L = L / np.sqrt(np.sum(L ** 2, axis = 0, keepdims = True))
     #Create pitch salience matrix
     S = np.zeros((len(pc), L.shape[1]))
-
     for j in range(len(pc)):
         S[j,:] = pitchStrengthOneCandidate(f, L, pc[j])
     return S

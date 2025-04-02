@@ -1,10 +1,14 @@
 import numpy as np
-import librosa
-import swipep
+import matplotlib.pyplot as plt
+from data.containers.prepocessing import Preprocessed 
+from data.containers.sample import VoiceSample 
+#import librosa
+from data.utils.swipep import swipep
+
 class FundamentalFrequency:
     """Class to compute F0 pitch using the SWIPE' algorithm."""
 
-    def __init__(self, sample, plim=(30, 500), dt=0.01, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
+    def __init__(self, sample, plim=(30, 500), dt=0.02, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
         """
         Initialize with a VoiceSample, Preemphasis, or SignalNormalization object.
 
@@ -45,3 +49,24 @@ class FundamentalFrequency:
     def get_strength(self):
         """Return pitch strength values."""
         return self.strength
+    
+def main():
+    """Main function to demonstrate the usage of FundamentalFrequency class."""
+    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
+    ff = FundamentalFrequency(VoiceSample.from_wav(folder_path))
+    f0 = ff.get_f0()
+    time = ff.get_time()
+    strength = ff.get_strength()
+
+        # Plotting the results
+    plt.figure(figsize=(10, 6))
+    plt.plot(time, f0, label='F0', marker="x")
+    plt.title("Fundamental Frequency Over Time")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Frequency (Hz)")
+    plt.legend()
+    plt.grid()
+    plt.show(block = True)
+
+if __name__ == "__main__":
+    main()
