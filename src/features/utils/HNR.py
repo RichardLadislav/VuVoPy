@@ -1,69 +1,54 @@
-
 import numpy as np
-import scipy.io.wavfile as wav
-#import scipy.signal as signal
+from data.containers.prepocessing import Preprocessed as pp
+from data.containers.sample import VoiceSample as vs
+from data.containers.segmentation import Segmented as sg
+from data.utils.fundamental_frequency import FundamentalFrequency as ff
 
-def hnr(segment, fs, winlen= 512, winover= 256, f0_min=75, f0_max=500):
+def hnr(folder_path, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
     """
-    Compute Harmonics-to-Noise Ratio (HNR) using autocorrelation with Hamming window.
-    
+    Compute Harmonics-to-Noise Ratio (HNR) using the FundamentalFrequency class for F0 estimation.
+
     Parameters:
-    - signal: The input audio signal
-    - fs: Sampling frequency (Hz)
-    - frame_length: Frame length in seconds (default: 40 ms)
-    - overlap: Overlap percentage (default: 50%)
+    - folder_path: Path to the audio file  
+    - winlen: Frame length in frames (default: 512)
+    - winover: Overlap in frames (default: 256)
+    - wintype: Window type (default: "hann")
     - f0_min: Minimum fundamental frequency (Hz)
     - f0_max: Maximum fundamental frequency (Hz)
 
     Returns:
     - Mean HNR value across frames
     """
-    segment = sg.from_voice_sample(pp.from_voice_sample(vs.from_wav(folder_path)),winlen, wintype ,winover
-    hnr_values = []
 
-    for i in range(num_frames):
-        frame = signal[i * step_size : i * step_size + frame_size]
-        
-        if len(frame) < frame_size:
+    # Load and preprocess the audio file
+    voice_sample = vs.from_wav(folder_path)
+    processed_sample = pp.from_voice_sample(voice_sample)
+    
+    fs = voice_sample.get_sampling_rate()  # Get sampling rate
+
+    # Compute fundamental frequency using FundamentalFrequency class
+    fundamental_freq = ff(vs.from_wav(folder_path), plim, hop_size, dlog2p, dERBs, sTHR).get_f0()
+
+    fundamental_freq_1 = fundamental_freq[np.nonzero(fundamental_freq>40)]  # Remove zeros and values below 30 hz
+    hnr_values = []
+    for f0 in fundamental_freq_1:
+        if np.isnan(f0) or f0 <= 0:
             continue
 
-        # Apply Hamming window
-        # Compute normalized autocorrelation
-        autocorr = np.correlate(frame, frame, mode='full') / np.dot(frame, frame)
-        autocorr = autocorr[len(autocorr) // 2:]  # Keep only positive lags
+        # Compute harmonic-to-noise approximation
+        r_max = np.exp(-f0 / (fs / 2))  # Approximate harmonicity measure
+        hnr = 10 * np.log10(r_max / (1 - r_max)) if 0 < r_max < 1 else np.nan
+        hnr_values.append(hnr)
 
-        # Find fundamental period (max autocorr peak within f0 range)
-        min_period = int(fs / f0_max)  # Corresponds to max frequency
-        max_period = int(fs / f0_min)  # Corresponds to min frequency
-
-        if max_period >= len(autocorr):
-            max_period = len(autocorr) - 1
-
-        peak_idx = np.argmax(autocorr[min_period:max_period]) + min_period
-        r_max = autocorr[peak_idx]  # Max autocorrelation peak
-
-        # Compute HNR using the definition
-        if r_max > 0:
-            hnr = 10 * np.log10(r_max / (1 - r_max))
-            hnr_values.append(hnr)
-
-    if len(hnr_values) > 0:
-        return np.mean(hnr_values)
-    else:
-        return float('nan')
+    return np.nanmean(hnr_values) if len(hnr_values) > 0 else float('nan')
 
 if __name__ == "__main__":
-
-
-    # Read input arguments
-    file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"  #Replace with your actual file
-    overlap_percentage = 50 / 100  # Convert percentage to fraction
-
-    # Read audio file
-
-#    audio, fs = librosa.load(file_path, sr=None)  # Load audio
-    # Convert to mono if stereo
-
+    file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
 
     # Compute HNR
-    print(f"Mean HNR: {hnr_value:.2f} dB")
+    hnr_value = hnr(file_path)
+
+    if np.isnan(hnr_value):
+        print("Could not compute HNR.")
+    else:
+        print(f"Mean HNR: {hnr_value:.2f} dB")
