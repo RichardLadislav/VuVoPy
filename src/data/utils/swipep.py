@@ -99,7 +99,6 @@ def swipep(x,fs,plim,hop_size,dlog2p,dERBs,sTHR):
             tc = 1.0 / pc[I]  # Convert pitch candidates to periods
             ntc = (tc / tc[1] - 1) * 2 * np.pi  # Normalize periods
             # Perform parabolic interpolation using polyfit
-            S_help = S[I, j]
             c = np.polyfit(np.squeeze(ntc), S[I, j], 2)
             # Generate fine-tuned frequency candidates for interpolation
             ftc = 1.0 / 2.0**np.arange(np.log2(pc[I[0]]), np.log2(pc[I[2]]) + 1/12/64, 1/12/64)
