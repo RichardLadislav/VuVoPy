@@ -5,7 +5,7 @@ from data.containers.sample import VoiceSample as vs
 from data.containers.segmentation import Segmented as sg
 from data.utils.fundamental_frequency import FundamentalFrequency as ff
 
-def hnr_cepstrum(folder_path, winlen=1600, winover=256, wintype='hann', f0_min=75, f0_max=500):
+def hnr_cepstrum(folder_path, winlen=1024, winover=512, wintype='hann', f0_min=75, f0_max=500):
     """
     Compute HNR using cepstral analysis (quefrency method).
 
@@ -57,7 +57,7 @@ def hnr_cepstrum(folder_path, winlen=1600, winover=256, wintype='hann', f0_min=7
     return np.mean(hnr_values) if hnr_values else float('nan')
 
 if __name__ == "__main__":
-    file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//sine_no_noise.wav"
+    file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//recordings-20250306T192251Z-001//recordings//K1020//K1020_7.1-1-a_1.wav"
     # Compute HNR
     hnr_value = hnr_cepstrum(file_path)
     if np.isnan(hnr_value):

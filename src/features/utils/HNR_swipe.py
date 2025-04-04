@@ -31,7 +31,7 @@ def hnr(folder_path, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1, sTH
 
     fundamental_freq_1 = fundamental_freq[np.nonzero(fundamental_freq>40)]  # Remove zeros and values below 30 hz
     hnr_values = []
-    for f0 in fundamental_freq:
+    for f0 in fundamental_freq_1:
         if np.isnan(f0) or f0 <= 0:
             continue
 
@@ -43,7 +43,8 @@ def hnr(folder_path, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1, sTH
     return np.nanmean(hnr_values) if len(hnr_values) > 0 else float('nan')
 
 if __name__ == "__main__":
-    file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//sine_wave_no_noise.wav"
+    file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//recordings-20250306T192251Z-001//recordings//K1019//K1019_8.2-1_1.wav"
+
 
     # Compute HNR
     hnr_value = hnr(file_path)
