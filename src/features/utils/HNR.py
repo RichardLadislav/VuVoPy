@@ -3,7 +3,7 @@ from data.containers.prepocessing import Preprocessed as pp
 from data.containers.sample import VoiceSample as vs
 from data.containers.segmentation import Segmented as sg
 
-def hnr(folder_path, winlen=512, winover=256, wintype='hann', f0_min=75, f0_max=500):
+def hnr(folder_path, winlen=512, winover=256 , wintype='hann', f0_min=75, f0_max=500):
     """
     Compute Harmonics-to-Noise Ratio (HNR) using an autocorrelation-based method.
 

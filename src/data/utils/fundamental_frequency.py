@@ -11,7 +11,7 @@ class FundamentalFrequency:
     def __init__(self, sample, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
         """
         Initialize with a VoiceSample, Preemphasis, or SignalNormalization object.
-
+`
         Parameters:
         - sample   : VoiceSample or derived class (Preemphasis, SignalNormalization)
         - plim     : Tuple (min_freq, max_freq) for pitch search range
@@ -49,6 +49,9 @@ class FundamentalFrequency:
     def get_strength(self):
         """Return pitch strength values."""
         return self.strength
+    def get_sampling_rate(self):
+        """Return the sampling rate."""
+        return self.fs
     
 def main():
     """Main function to demonstrate the usage of FundamentalFrequency class."""
