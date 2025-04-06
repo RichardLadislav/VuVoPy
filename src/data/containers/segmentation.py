@@ -58,8 +58,6 @@ class Segmented(Preprocessed):  # Fixed typo in class name
 
         return cls(x, fs, x_norm, x_preem, xsegment, winlen, wintype, winover, alpha)
 
-    
-
     def get_segment(self):
         """Return the waveform as a NumPy array."""
         return self.xsegment[:,:,0]
@@ -75,7 +73,19 @@ class Segmented(Preprocessed):  # Fixed typo in class name
     def get_sampling_rate(self):
         """Return the sampling rate."""
         return self.fs
-    
+
+    def get_window_type(self):
+        """Return the window type."""
+        return self.wintype
+
+    def get_window_length(self):
+        """Return the window length."""
+        return self.winlen
+
+    def get_window_overlap(self):
+        """Return the window overlap."""
+        return self.winover
+
 def main():
     folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
     processed_sample = Preprocessed.from_voice_sample(VoiceSample.from_wav(folder_path))
