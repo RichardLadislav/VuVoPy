@@ -17,13 +17,13 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
     """
     
     features = []
-    frame_length = segments.shape[1]
+    frame_length = segments.shape[0]
     b = sr / frame_length 
 
     for frame in segments:
-        spectrum = np.abs(np.fft.rfft(frame, n=len(frame)))
-        freqs = np.fft.rfftfreq(len(frame), 1 / sr)
-
+        spectrum = np.abs(np.fft.rfft(frame, n=frame_length))
+        freqs = np.fft.rfftfreq(frame_length, 1 / sr)
+        fame_hlep = len(frame)
         # E: Frame energy above 200 Hz
         mask = freqs > 200
         E = 10 * np.log10(np.sum(spectrum[mask] ** 2) + 1e-10)
@@ -48,8 +48,8 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
         Ehi = 10 * np.log10(high_energy / (low_energy + 1e-10) + 1e-10)
 
         # C1: Normalized autocorrelation coefficient
-        s_prev = frame[:-1] if len(frame) > 1 else frame
-        C1 = np.correlate(frame, s_prev[:len(frame)])[0] / (np.sum(frame ** 2) + 1e-10)
+        s_prev = frame[:-1] if frame_length > 1 else frame
+        C1 = np.correlate(frame, s_prev[:frame_length])[0] / (np.sum(frame ** 2) + 1e-10)
 
         # Nz: Zero-crossing rate after Chebyshev filtering
         sos = scipy.signal.cheby2(22, 20, [0.2, 4], btype='bandpass', fs=sr, output='sos')
@@ -90,7 +90,7 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
     ])
 
     # Step 2: Post-processing cleanup
-    frame_duration = (512-winover) / sr  # seconds
+    frame_duration = (frame_length-winover) / sr  # seconds
     min_duration_frames = int(0.01 / frame_duration)  #  10ms
     long_wait_frames = int(0.05 / frame_duration)  # 90ms
     
