@@ -12,6 +12,7 @@ class Vuvs:
         self.segment = segment.get_segment()
         self.segment_preem = segment.get_preem_segment()
         self.segment_norm = segment.get_norm_segment()
+        #self.segment = segment
         self.fs = fs
         self.winlen = winlen
         self.winover = winover
@@ -39,6 +40,8 @@ def main():
     vsample = vs.from_wav(folder_path)
     preprocessed_sample = pp.from_voice_sample(vsample)
     segment = sg.from_voice_sample(preprocessed_sample, winlen=512, wintype='hamm', winover=496, alpha=0.94)
+    seg = segment.get_segment()
+    
     vuvs = Vuvs(segment, fs=vsample.get_sampling_rate(), winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
 
     y = vsample.get_waveform()

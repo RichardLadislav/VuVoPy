@@ -1,8 +1,8 @@
 import numpy as np
 from sklearn.mixture import GaussianMixture
-import scipy.signal
 from scipy.stats import mode
 import time 
+import librosa
 
 def vuvs_gmm(segments, sr, winover, smoothing_window=5):
     """
@@ -21,13 +21,15 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
     features = []
     frame_length = segments.shape[1]
     b = sr / frame_length 
+    pitch_freqs = np.arange(70, 400, 10)
+    harmonic_energies = []
     #sos = scipy.signal.cheby2(22, 20, [0.2, 4], btype='bandpass', fs=sr, output='sos')
-    #segments = segments.T  # Transpose to iterate over frames
+    segments = segments.T  # Transpose to iterate over frames
 
-    for idx, frame in enumerate(segments):
+    for frame in segments:
+
         start = time.time()
-
-        frame = np.ascontiguousarray(frame)
+        #frame = np.ascontiguousarray(frame)
         spectrum = np.abs(np.fft.rfft(frame, n=len(frame)))
         freqs = np.fft.rfftfreq(len(frame), 1 / sr)
         #fame_hlep = len(frame)
@@ -36,18 +38,19 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
         E = 10 * np.log10(np.sum(spectrum[mask] ** 2) + 1e-10)
 
         # Eh: Comb-filtered harmonic energy (approximation)
-        pitch_freqs = np.arange(70, 400, 10)
-        harmonic_energies = []
-        for f0 in pitch_freqs:
-            kmax = int((sr / 2) / f0 - 0.5)
-            if kmax <= 0:
-                continue
-            numer = np.sum([spectrum[int((kf) / b)] ** 2 for kf in range(1, kmax + 1)])
-            denom = np.sum([spectrum[int((kf + 0.5) / b)] ** 2 for kf in range(1, kmax + 1)])
-            if denom > 0:
-                harmonic_energies.append(10 * np.log10(numer / denom + 1e-10))
-        Eh = max(harmonic_energies) if harmonic_energies else 0
+        start1 = time.time()
+        #for f0 in pitch_freqs:
+        #    kmax = int((sr / 2) / f0 - 0.5)
+        #    if kmax <= 0:
+        #        continue
+        #    numer = np.sum([spectrum[int((kf) / b)] ** 2 for kf in range(1, kmax + 1)])
+        #    denom = np.sum([spectrum[int((kf + 0.5) / b)] ** 2 for kf in range(1, kmax + 1)])
+        #    if denom > 0:
+        #        harmonic_energies.append(10 * np.log10(numer / denom + 1e-10))
+        #Eh = max(harmonic_energies) if harmonic_energies else 0
 
+        end1 = time.time()
+        print(f'Frame {len(features)}: {end1 - start1:.4f} seconds')
         # Ehi: High-frequency to low-frequency ratio
         mid = int(len(freqs) * 0.25)
         low_energy = np.sum(spectrum[:mid] ** 2)
@@ -60,13 +63,13 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
         # Nz: Zero-crossing rate after Chebyshev filtering
  
         #filtered = scipy.signal.sosfilt(sos, frame)
-        #zrc = ((filtered[:-1] * filtered[1:]) < 0).sum()
-        
+        #zcr = ((filtered[:-1] * filtered[1:]) < 0).sum()
+        Eh = 1
         zcr =np.sum(np.diff(np.sign(frame)) != 0)
         features.append([E, 100 * C1, Eh, Ehi, zcr])
-        end = time.time()
-        #print(f'Frame {idx+1        }: {end - start:.4f} seconds')
 #        count += 1
+        end = time.time()
+        print(f'Frame : {end - start:.4f} seconds')
     features = np.array(features)
 
     #print(f' OON for loop count {count}.')
