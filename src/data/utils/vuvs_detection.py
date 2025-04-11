@@ -10,7 +10,7 @@ class Vuvs:
     
     def __init__(self, segment, fs, winlen = 512, winover = 256, wintype = 'hann', smoothing_window=5):
         self.segment = segment.get_segment()
-        self.segment_prem = segment.get_preem_segment()
+        self.segment_preem = segment.get_preem_segment()
         self.segment_norm = segment.get_norm_segment()
         self.fs = fs
         self.winlen = winlen
@@ -23,7 +23,7 @@ class Vuvs:
         
     def calculate_vuvs(self):
         """Compute voiced/unvoiced/scilence segments using GMM."""
-        return vuvs_gmm(self.segment_prem, self.fs, self.winover, self.smoothing_window)
+        return vuvs_gmm(self.segment, self.fs, self.winover, self.smoothing_window)
 
     def get_vuvs(self):
         """Return computed voiced/unvoiced/scilence segments."""
@@ -38,7 +38,7 @@ def main():
     folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
     vsample = vs.from_wav(folder_path)
     preprocessed_sample = pp.from_voice_sample(vsample)
-    segment = sg.from_voice_sample(preprocessed_sample, winlen=512, wintype='hamm', winover=256, alpha=0.94)
+    segment = sg.from_voice_sample(preprocessed_sample, winlen=512, wintype='hamm', winover=496, alpha=0.94)
     vuvs = Vuvs(segment, fs=vsample.get_sampling_rate(), winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
 
     y = vsample.get_waveform()
