@@ -58,8 +58,10 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
         
         features.append([E, 100 * C1, Eh, Ehi, zrc])
 
+        count += 1
     features = np.array(features)
 
+    print(f' OON for loop count{count}.')
     # Classify voiced/unvoiced/silence using GMM
     gmm1 = GaussianMixture(n_components=2, covariance_type='diag', random_state=0, max_iter=100)
     gmm1.fit(features)  
