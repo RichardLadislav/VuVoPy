@@ -15,15 +15,16 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
     Returns:
     - np.ndarray : Array of classified segments (0: unvoiced, 1: voiced, 2: silence).
     """
-    
+    count = 0 
     features = []
     frame_length = segments.shape[0]
     b = sr / frame_length 
+    segments = segments.T  # Transpose to iterate over frames
 
     for frame in segments:
         spectrum = np.abs(np.fft.rfft(frame, n=frame_length))
         freqs = np.fft.rfftfreq(frame_length, 1 / sr)
-        fame_hlep = len(frame)
+        #fame_hlep = len(frame)
         # E: Frame energy above 200 Hz
         mask = freqs > 200
         E = 10 * np.log10(np.sum(spectrum[mask] ** 2) + 1e-10)
@@ -48,7 +49,7 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
         Ehi = 10 * np.log10(high_energy / (low_energy + 1e-10) + 1e-10)
 
         # C1: Normalized autocorrelation coefficient
-        s_prev = frame[:-1] if frame_length > 1 else frame
+        s_prev = frame[:-1] if count > 1 else frame
         C1 = np.correlate(frame, s_prev[:frame_length])[0] / (np.sum(frame ** 2) + 1e-10)
 
         # Nz: Zero-crossing rate after Chebyshev filtering
@@ -61,7 +62,8 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
         count += 1
     features = np.array(features)
 
-    print(f' OON for loop count{count}.')
+    #print(f' OON for loop count {count}.')
+    #print(f' farme lenght {fame_hlep}.')
     # Classify voiced/unvoiced/silence using GMM
     gmm1 = GaussianMixture(n_components=2, covariance_type='diag', random_state=0, max_iter=100)
     gmm1.fit(features)  
