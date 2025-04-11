@@ -23,7 +23,7 @@ class Vuvs:
         
     def calculate_vuvs(self):
         """Compute voiced/unvoiced/scilence segments using GMM."""
-        return vuvs_gmm(self.segment_norm, self.fs, self.winover, self.smoothing_window)
+        return vuvs_gmm(self.segment, self.fs, self.winover, self.smoothing_window)
 
     def get_vuvs(self):
         """Return computed voiced/unvoiced/scilence segments."""
