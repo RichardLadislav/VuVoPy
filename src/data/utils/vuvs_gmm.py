@@ -1,8 +1,6 @@
 import numpy as np
 from sklearn.mixture import GaussianMixture
 from scipy.stats import mode
-import time 
-import librosa
 
 def vuvs_gmm(segments, sr, winover, smoothing_window=5):
     """
