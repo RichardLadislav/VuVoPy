@@ -39,15 +39,15 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
 
         # Eh: Comb-filtered harmonic energy (approximation)
         start1 = time.time()
-        #for f0 in pitch_freqs:
-        #    kmax = int((sr / 2) / f0 - 0.5)
-        #    if kmax <= 0:
-        #        continue
-        #    numer = np.sum([spectrum[int((kf) / b)] ** 2 for kf in range(1, kmax + 1)])
-        #    denom = np.sum([spectrum[int((kf + 0.5) / b)] ** 2 for kf in range(1, kmax + 1)])
-        #    if denom > 0:
-        #        harmonic_energies.append(10 * np.log10(numer / denom + 1e-10))
-        #Eh = max(harmonic_energies) if harmonic_energies else 0
+        for f0 in pitch_freqs:
+            kmax = int((sr / 2) / f0 - 0.5)
+            if kmax <= 0:
+                continue
+            numer = np.sum([spectrum[int((kf) / b)] ** 2 for kf in range(1, kmax + 1)])
+            denom = np.sum([spectrum[int((kf + 0.5) / b)] ** 2 for kf in range(1, kmax + 1)])
+            if denom > 0:
+                harmonic_energies.append(10 * np.log10(numer / denom + 1e-10))
+        Eh = max(harmonic_energies) if harmonic_energies else 0
 
         end1 = time.time()
         print(f'Frame {len(features)}: {end1 - start1:.4f} seconds')
@@ -64,7 +64,7 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
  
         #filtered = scipy.signal.sosfilt(sos, frame)
         #zcr = ((filtered[:-1] * filtered[1:]) < 0).sum()
-        Eh = 1
+        #Eh = 1
         zcr =np.sum(np.diff(np.sign(frame)) != 0)
         features.append([E, 100 * C1, Eh, Ehi, zcr])
 #        count += 1
