@@ -1,7 +1,8 @@
 import numpy as np
 from sklearn.mixture import GaussianMixture
-import scipy.signal
 from scipy.stats import mode
+import time 
+import librosa
 
 def vuvs_gmm(segments, sr, winover, smoothing_window=5):
     """
@@ -15,32 +16,18 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
     Returns:
     - np.ndarray : Array of classified segments (0: unvoiced, 1: voiced, 2: silence).
     """
-    count = 0 
+
     features = []
-    frame_length = segments.shape[0]
-    b = sr / frame_length 
+    frame_length = segments.shape[1]
     segments = segments.T  # Transpose to iterate over frames
 
     for frame in segments:
         spectrum = np.abs(np.fft.rfft(frame, n=frame_length))
         freqs = np.fft.rfftfreq(frame_length, 1 / sr)
-        #fame_hlep = len(frame)
+
         # E: Frame energy above 200 Hz
         mask = freqs > 200
         E = 10 * np.log10(np.sum(spectrum[mask] ** 2) + 1e-10)
-
-        # Eh: Comb-filtered harmonic energy (approximation)
-        pitch_freqs = np.arange(70, 400, 10)
-        harmonic_energies = []
-        for f0 in pitch_freqs:
-            kmax = int((sr / 2) / f0 - 0.5)
-            if kmax <= 0:
-                continue
-            numer = np.sum([spectrum[int((kf) / b)] ** 2 for kf in range(1, kmax + 1)])
-            denom = np.sum([spectrum[int((kf + 0.5) / b)] ** 2 for kf in range(1, kmax + 1)])
-            if denom > 0:
-                harmonic_energies.append(10 * np.log10(numer / denom + 1e-10))
-        Eh = max(harmonic_energies) if harmonic_energies else 0
 
         # Ehi: High-frequency to low-frequency ratio
         mid = int(len(freqs) * 0.25)
@@ -49,21 +36,14 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
         Ehi = 10 * np.log10(high_energy / (low_energy + 1e-10) + 1e-10)
 
         # C1: Normalized autocorrelation coefficient
-        s_prev = frame[:-1] if count > 1 else frame
+        s_prev = frame[:-1] #if count > 0 else frame
         C1 = np.correlate(frame, s_prev[:frame_length])[0] / (np.sum(frame ** 2) + 1e-10)
-
-        # Nz: Zero-crossing rate after Chebyshev filtering
-        sos = scipy.signal.cheby2(22, 20, [0.2, 4], btype='bandpass', fs=sr, output='sos')
-        filtered = scipy.signal.sosfilt(sos, frame)
-        zrc = ((filtered[:-1] * filtered[1:]) < 0).sum()
-        
-        features.append([E, 100 * C1, Eh, Ehi, zrc])
-
-        count += 1
+        # Nz: Zero-crossing rate 
+ 
+        zcr =np.sum(np.diff(np.sign(frame)) != 0)
+        features.append([E, 100 * C1, Ehi, zcr])
     features = np.array(features)
 
-    #print(f' OON for loop count {count}.')
-    #print(f' farme lenght {fame_hlep}.')
     # Classify voiced/unvoiced/silence using GMM
     gmm1 = GaussianMixture(n_components=2, covariance_type='diag', random_state=0, max_iter=100)
     gmm1.fit(features)  

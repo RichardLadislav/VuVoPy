@@ -12,6 +12,7 @@ class Vuvs:
         self.segment = segment.get_segment()
         self.segment_preem = segment.get_preem_segment()
         self.segment_norm = segment.get_norm_segment()
+        #self.segment = segment
         self.fs = fs
         self.winlen = winlen
         self.winover = winover
@@ -34,11 +35,12 @@ class Vuvs:
         return self.fs
 def main():
     """Main function to demonstrate the usage of Vuvs class."""
-    #folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
+    folder_path = "file_to_analyze"
     vsample = vs.from_wav(folder_path)
     preprocessed_sample = pp.from_voice_sample(vsample)
     segment = sg.from_voice_sample(preprocessed_sample, winlen=512, wintype='hamm', winover=496, alpha=0.94)
+    seg = segment.get_segment()
+    
     vuvs = Vuvs(segment, fs=vsample.get_sampling_rate(), winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
 
     y = vsample.get_waveform()
