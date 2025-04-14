@@ -12,7 +12,6 @@ class Vuvs:
         self.segment = segment.get_segment()
         self.segment_preem = segment.get_preem_segment()
         self.segment_norm = segment.get_norm_segment()
-        #self.segment = segment
         self.fs = fs
         self.winlen = winlen
         self.winover = winover
@@ -94,6 +93,7 @@ class Vuvs:
                 i += 1
         return durations
 
+    
 
 def main():
     """Main function to demonstrate the usage of Vuvs class."""
@@ -101,29 +101,13 @@ def main():
     vsample = vs.from_wav(folder_path)
     preprocessed_sample = pp.from_voice_sample(vsample)
     segment = sg.from_voice_sample(preprocessed_sample, winlen=512, wintype='hamm', winover=496, alpha=0.94)
-    seg = segment.get_segment()
-    
     vuvs = Vuvs(segment, fs=vsample.get_sampling_rate(), winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
-
     y = vsample.get_waveform()
     labels = vuvs.get_vuvs()
     sr = vsample.get_sampling_rate()
-    #hop_length = segment.get_window_overlap()
     hop_length = segment.get_window_length() - segment.get_window_overlap()
     time = np.linspace(0, len(y) / sr, num=len(y))
-    frame_times = np.arange(len(labels)) * hop_length / sr
-    labels_length = len(labels) * hop_length
-    print(f"Frame times: {labels_length}")
-    siganl_length = len(y) 
-    print(f"Frame times: {siganl_length}")
 
-    Silence_count = vuvs.get_silence_count()
-    Silence_duration = vuvs.get_total_silence_duration()
-    Silence_duration_S = vuvs.get_silence_durations()
-    # Classification line: -1 (silence), 0 (unvoiced), 1 (voiced)
-    print(f"Silence count : {Silence_count}")
-    print(f"Silence duration: {Silence_duration}")
-    print(f"Silence duration: {Silence_duration_S}")
     class_line = np.array([(-1 if l == 0 else 0 if l == 1 else 1) for l in labels])
 
     # Stretch classification line to match waveform length
