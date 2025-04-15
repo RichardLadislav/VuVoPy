@@ -29,6 +29,5 @@ def main():
     aud = VoiceSample.from_wav(folder_path)
     x = aud.get_waveform()
     fs = aud.get_sampling_rate()
-
     print(fs)
     plt.plot(x)

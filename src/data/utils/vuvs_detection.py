@@ -102,11 +102,12 @@ def main():
     preprocessed_sample = pp.from_voice_sample(vsample)
     segment = sg.from_voice_sample(preprocessed_sample, winlen=512, wintype='hamm', winover=496, alpha=0.94)
     vuvs = Vuvs(segment, fs=vsample.get_sampling_rate(), winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
-    y = vsample.get_waveform()
     labels = vuvs.get_vuvs()
+    y = vsample.get_waveform()
     sr = vsample.get_sampling_rate()
     hop_length = segment.get_window_length() - segment.get_window_overlap()
     time = np.linspace(0, len(y) / sr, num=len(y))
+
 
     class_line = np.array([(-1 if l == 0 else 0 if l == 1 else 1) for l in labels])
 
@@ -116,7 +117,7 @@ def main():
         start = i * hop_length
         end = start + hop_length
         class_signal[start:end] = value
- 
+    # plotting the results
     plt.figure(figsize=(14, 5))
     plt.plot(time, y / np.max(np.abs(y)), label="Normalized Waveform", color='gray', alpha=0.6)
     plt.plot(time, class_signal, label="V/UV/S Classification", color='black', linewidth=1.5)
