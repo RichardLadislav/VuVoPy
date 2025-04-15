@@ -109,12 +109,14 @@ def main():
     segment = sg.from_voice_sample(preprocessed_sample, winlen=512, wintype='hamm', winover=496, alpha=0.94)
     vuvs = Vuvs(segment, fs=vsample.get_sampling_rate(), winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
     y = vsample.get_waveform()
+    segment_waveform = segment.get_segment()
     y_len = len(y)
     #labels = vuvs.get_vuvs()
-    time, labels  = vuvs.get_timed_vuvs()
+    time1, labels  = vuvs.get_timed_vuvs()
+    lab_len = len(labels)
     sr = vsample.get_sampling_rate()
     hop_length = segment.get_window_length() - segment.get_window_overlap()
-    #time = np.linspace(0, len(y) / sr, num=len(y))
+    time = np.linspace(0, len(y) / sr, num=len(y))
 
 
     class_line = np.array([(-1 if l == 0 else 0 if l == 1 else 1) for l in labels])
