@@ -23,7 +23,7 @@ class VoicedSample:
         Stretch the labels to match signal length.
         """
 
-        time_vuvs, labels = self.vuvs.get_timed_vuvs()
+        labels = self.vuvs.get_vuvs()
         arr = np.asarray(labels)
         target_len = len(self.x)
         # Find segments where values stay the same
