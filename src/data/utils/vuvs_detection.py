@@ -25,12 +25,6 @@ class Vuvs:
         """Compute voiced/unvoiced/scilence segments using GMM."""
         return vuvs_gmm(self.segment, self.fs, self.winover, self.smoothing_window)
 
-    def get_timed_vuvs(self):
-        """Return computed voiced/unvoiced/scilence segments with time."""
-        hop_duration = (self.winlen - self.winover) / self.fs
-        time = np.arange(0, len(self.vuvs) * hop_duration, hop_duration)
-        return time, self.vuvs
-
     def get_vuvs(self):
         """Return computed voiced/unvoiced/scilence segments."""
         return self.vuvs
@@ -108,12 +102,8 @@ def main():
     preprocessed_sample = pp.from_voice_sample(vsample)
     segment = sg.from_voice_sample(preprocessed_sample, winlen=512, wintype='hamm', winover=496, alpha=0.94)
     vuvs = Vuvs(segment, fs=vsample.get_sampling_rate(), winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
+    labels = vuvs.get_vuvs()
     y = vsample.get_waveform()
-    segment_waveform = segment.get_segment()
-    y_len = len(y)
-    #labels = vuvs.get_vuvs()
-    time1, labels  = vuvs.get_timed_vuvs()
-    lab_len = len(labels)
     sr = vsample.get_sampling_rate()
     hop_length = segment.get_window_length() - segment.get_window_overlap()
     time = np.linspace(0, len(y) / sr, num=len(y))
@@ -127,7 +117,7 @@ def main():
         start = i * hop_length
         end = start + hop_length
         class_signal[start:end] = value
- 
+    # plotting the results
     plt.figure(figsize=(14, 5))
     plt.plot(time, y / np.max(np.abs(y)), label="Normalized Waveform", color='gray', alpha=0.6)
     plt.plot(time, class_signal, label="V/UV/S Classification", color='black', linewidth=1.5)

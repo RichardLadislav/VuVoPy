@@ -17,8 +17,6 @@ class VoicedSample:
         self.fs = preprocessed.get_sampling_rate()
         self.vuvs = vuvs
 
-     #   self.voiced_sample = self.get_voiced_sample()
-      #  self.silence_remove_sample = self.get_silence_remove_sample()
 
     def label_stretch(self):
         """
@@ -95,15 +93,17 @@ class VoicedSample:
         return self.x[mask]
     
 def main():
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
+    folder_path = "file_path.wav"
     preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))
     segment = sg.from_voice_sample(preprocessed_sample, winlen=512, winover=496, wintype='hamm')
     fs = segment.get_sampling_rate()
+    
     labels = vuvs(segment, fs=fs, winlen=segment.get_window_length(), winover=segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
     voiced_sample = VoicedSample(preprocessed_sample,labels,fs).get_voiced_sample()
     silence_removed_sample = VoicedSample(preprocessed_sample, labels, fs).get_silence_remove_sample()
     voiced_sample = VoicedSample(preprocessed_sample, labels, fs).get_voiced_sample()
     stretched_labels = VoicedSample(preprocessed_sample, labels, fs).label_stretch()
+    #    Plotting the results
     plt.figure(figsize=(12, 6))
     plt.plot(stretched_labels, label='stretched labels')
     plt.figure(figsize=(12, 6))
