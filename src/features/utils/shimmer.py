@@ -6,7 +6,7 @@ from data.containers.segmentation import Segmented as sg
 from data.utils.vuvs_detection import Vuvs as vuvs
 from data.containers.voiced_sample import VoicedSample as vos
 
-def shimmerAPQ(folder_path, n_points=5, plim=(30, 500), sTHR=0.5):
+def shimmerAPQ(folder_path, n_points=5, plim=(30, 500), sTHR=0.5, winlen = 512, winover = 496 , wintype = 'hamm'):
     """
     Calculate shimmer APQ-N: amplitude perturbation quotient over N-point window.
 
@@ -19,12 +19,16 @@ def shimmerAPQ(folder_path, n_points=5, plim=(30, 500), sTHR=0.5):
     Returns:
         float: shimmer APQ-N value
     """
-    sample = vs.from_wav(folder_path)
-    signal = sample.get_waveform()
-    sr = sample.get_sampling_rate()
+    preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))
+    segment = sg.from_voice_sample(preprocessed_sample, winlen, wintype, winover)
+    fs = segment.get_sampling_rate()
+    labels = vuvs(segment, fs=fs, winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
+    silence_removed_sample = vos(preprocessed_sample, labels, fs)
+    signal = silence_removed_sample.get_waveform()
+    sr = silence_removed_sample.get_sampling_rate()
 
     # Extract F0 and keep only voiced
-    f0_track = f0(sample, plim=plim, sTHR=sTHR).get_f0()
+    f0_track = f0(silence_removed_sample, plim=plim, sTHR=sTHR).get_f0()
     f0_track = f0_track[f0_track > 30]
     if len(f0_track) < n_points:
         return 0

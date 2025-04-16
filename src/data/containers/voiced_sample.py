@@ -5,7 +5,7 @@ from data.containers.sample import VoiceSample as vs
 from data.containers.segmentation import Segmented as sg
 from data.utils.vuvs_detection import Vuvs as vuvs
 
-class VoicedSample:
+class VoicedSample(vs):
     """
     Class to detect voiced/unvoiced/silence segments in an audio signal using GMM.
     """
@@ -17,6 +17,14 @@ class VoicedSample:
         self.fs = preprocessed.get_sampling_rate()
         self.vuvs = vuvs
 
+        self.voiced_sample = self.get_voiced_sample()
+        self.silence_removed_sample = self.get_silence_remove_sample()
+
+    def get_waveform(self):
+        """
+        Return the silence removed waveform as a NumPy array.
+        """
+        return self.voiced_sample
 
     def label_stretch(self):
         """
@@ -91,9 +99,14 @@ class VoicedSample:
                 mask[start:end] = False
         
         return self.x[mask]
+    def get_sampling_rate(self):
+        """
+        Return the sampling rate.
+        """
+        return self.fs
     
 def main():
-    folder_path = "file_path.wav"
+    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
     preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))
     segment = sg.from_voice_sample(preprocessed_sample, winlen=512, winover=496, wintype='hamm')
     fs = segment.get_sampling_rate()
@@ -115,5 +128,6 @@ def main():
     plt.plot(preprocessed_sample.get_waveform(), label='voiced signal')
     plt.figure(figsize=(12, 6))
     plt.plot(silence_removed_sample, label='voiced signal')
+    print("done done doneeee")
 if __name__ == "__main__":
     main()

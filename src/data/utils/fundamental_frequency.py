@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from data.containers.prepocessing import Preprocessed 
 from data.containers.sample import VoiceSample 
-#import librosa
 from data.utils.swipep import swipep
 
 class FundamentalFrequency:
