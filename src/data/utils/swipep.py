@@ -6,42 +6,41 @@ from scipy.interpolate import CubicSpline
 
 # Check i  f 'plim' exists and is not None or empty, else set default value
 def swipep(x,fs,plim,hop_size,dlog2p,dERBs,sTHR):
-    def swipep(x, fs, plim, hop_size, dlog2p, dERBs, sTHR):
-        """
-        Perform the SWIPE' (Sawtooth Waveform Inspired Pitch Estimator) algorithm 
-        for pitch estimation in a given audio signal.
-        Parameters:
-        -----------
-        x : ndarray
-            Input audio signal (1D array).
-        fs : float
-            Sampling frequency of the audio signal (in Hz).
-        plim : tuple
-            Pitch range as a tuple (min_pitch, max_pitch) in Hz.
-        hop_size : float
-            Hop size for analysis (in samples).
-        dlog2p : float
-            Step size for pitch candidates in log2 scale.
-        dERBs : float
-            Step size for Equivalent Rectangular Bandwidth (ERB) spaced frequencies.
-        sTHR : float
-            Threshold for pitch strength to consider a valid pitch.
-        Returns:
-        --------
-        p : ndarray
-            Estimated pitch values (in Hz) for each time frame.
-        t : ndarray
-            Time vector corresponding to the pitch estimates (in seconds).
-        s : ndarray
-            Pitch strength values for each time frame.
-        Notes:
-        ------
-        - The function uses a multi-resolution analysis approach to estimate pitch.
-        - It computes pitch candidates, their strengths, and refines the pitch 
-          estimates using parabolic interpolation.
-        - The algorithm is robust to noise and works well for a wide range of 
-          pitch frequencies.
-        """
+    """
+     Perform the SWIPE' (Sawtooth Waveform Inspired Pitch Estimator) algorithm 
+     for pitch estimation in a given audio signal.
+     Parameters:
+     -----------
+     x : ndarray
+         Input audio signal (1D array).
+     fs : float
+         Sampling frequency of the audio signal (in Hz).
+     plim : tuple
+         Pitch range as a tuple (min_pitch, max_pitch) in Hz.
+     hop_size : float
+         Hop size for analysis (in samples).
+     dlog2p : float
+         Step size for pitch candidates in log2 scale.
+     dERBs : float
+         Step size for Equivalent Rectangular Bandwidth (ERB) spaced frequencies.
+     sTHR : float
+         Threshold for pitch strength to consider a valid pitch.
+     Returns:
+     --------
+     p : ndarray
+         Estimated pitch values (in Hz) for each time frame.
+     t : ndarray
+         Time vector corresponding to the pitch estimates (in seconds).
+     s : ndarray
+         Pitch strength values for each time frame.
+     Notes:
+     ------
+     - The function uses a multi-resolution analysis approach to estimate pitch.
+     - It computes pitch candidates, their strengths, and refines the pitch 
+       estimates using parabolic interpolation.
+     - The algorithm is robust to noise and works well for a wide range of 
+       pitch frequencies.
+    """
     
     dt = hop_size / fs  # Time step for analysis (seconds)
     t =np.arange( 0, len(x)/fs, dt)# time vektor
