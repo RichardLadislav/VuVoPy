@@ -74,7 +74,6 @@ def main():
     normalized = processed_sample.get_normalization()
     original = processed_sample.get_waveform()  
     sampling_rate = processed_sample.get_sampling_rate()
-    #TODO Vymyslet kombinovany preprocessing 
 
     print(sampling_rate)
     plt.plot(original, label="Original")
