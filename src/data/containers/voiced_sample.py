@@ -42,9 +42,9 @@ class VoicedSample(vs):
               segments.append(arr[start_idx:i])
               start_idx = i
         segments.append(arr[start_idx:])  # Add last segment
+        original_lens = np.array([len(seg) for seg in segments])
 
         # Determine how many samples per segment
-        original_lens = np.array([len(seg) for seg in segments])
         total_original = np.sum(original_lens)
     
         # Calculate how much to stretch each segment

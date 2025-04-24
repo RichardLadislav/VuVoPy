@@ -24,7 +24,7 @@ def shimmerAPQ(folder_path, n_points=5, plim=(30, 500), sTHR=0.5, winlen = 512, 
     fs = segment.get_sampling_rate()
     labels = vuvs(segment, fs=fs, winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
     silence_removed_sample = vos(preprocessed_sample, labels, fs)
-    signal = silence_removed_sample.get_waveform()
+    signal = silence_removed_sample.get_silence_remove_sample()
     sr = silence_removed_sample.get_sampling_rate()
 
     # Extract F0 and keep only voiced

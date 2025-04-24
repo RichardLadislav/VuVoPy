@@ -31,7 +31,7 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
         mid = int(len(freqs) * 0.25)
         low_energy = np.sum(spectrum[:mid] ** 2)
         high_energy = np.sum(spectrum[mid:] ** 2)
-        Ehi = 10 * np.log10(high_energy / (low_energy + 1e-10) + 1e-10)
+        Ehl = 10 * np.log10(high_energy / (low_energy + 1e-10) + 1e-10)
 
         # C1: Normalized autocorrelation coefficient
         s_prev = frame[:-1] #if count > 0 else frame
@@ -39,7 +39,7 @@ def vuvs_gmm(segments, sr, winover, smoothing_window=5):
         # Nz: Zero-crossing rate 
  
         zcr =np.sum(np.diff(np.sign(frame)) != 0)
-        features.append([E, 100 * C1, Ehi, zcr])
+        features.append([E, 100 * C1, Ehl, zcr])
     features = np.array(features)
 
     # Classify voiced/unvoiced/silence using GMM
