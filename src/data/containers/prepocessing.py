@@ -42,9 +42,7 @@ class Preprocessed(VoiceSample):
     def get_sampling_rate(self):
         """Return the sampling rate."""
         return self.fs
-    #TODO: Add segmentation function 
     #TODO: Add denoising function 
-    # Assuming 'voice_sample' is an instance of VoiceSample
 def main():
     folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
     processed_sample = Preprocessed.from_voice_sample(VoiceSample.from_wav(folder_path))
