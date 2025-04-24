@@ -5,17 +5,16 @@ from data.containers.segmentation import Segmented as sg
 from data.utils.vuvs_detection import Vuvs as vuvs
 def mpt(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
     """
-    Calculate the mean pitch period of the audio signal.
-    
+    Computes the Mean Phonation Time (MPT) from a given audio file.
     Parameters:
-    - folder_path : str : Path to the audio file.
-    - winlen      : int : Length of the window for segmentation.
-    - winover     : int : Overlap between consecutive windows.
-    - wintype     : str : Type of windowing function ('hann', 'hamm', 'blackman', 'square').
-    
+        folder_path (str): The file path to the audio sample in WAV format.
+        winlen (int, optional): The length of the analysis window. Default is 512.
+        winover (int, optional): The overlap between consecutive windows. Default is 496.
+        wintype (str, optional): The type of windowing function to apply (e.g., 'hamm' for Hamming). Default is 'hamm'.
     Returns:
-    - float : Mean pitch period of the audio signal.
+        float: The Mean Phonation Time (MPT) in seconds, calculated as the total duration of voiced segments.
     """
+    
     # Load and preprocess the audio sample
     preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))
     # Segment the preprocessed sample
