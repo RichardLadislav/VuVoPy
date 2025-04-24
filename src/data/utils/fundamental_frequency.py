@@ -10,12 +10,39 @@ from data.containers.segmentation import Segmented as sg
 from data.utils.vuvs_detection import Vuvs as vuvs
 from data.containers.voiced_sample import VoicedSample as vos
 class FundamentalFrequency:
-    """Class to compute F0 pitch using the SWIPE' algorithm."""
+    """
+    FundamentalFrequency is a class for analyzing and extracting the fundamental frequency (F0) 
+    from a given audio sample using the SWIPE' algorithm.
+    Attributes:
+        x (numpy.ndarray): The waveform of the input audio sample.
+        fs (int): The sampling rate of the input audio sample.
+        plim (tuple): A tuple specifying the pitch search range (min_freq, max_freq).
+        hop_size (int): The time step for analysis in samples.
+        dlog2p (float): The resolution of pitch candidates in log2 scale.
+        dERBs (float): The frequency resolution in ERBs.
+        sTHR (float): The pitch strength threshold.
+        f0 (numpy.ndarray): The computed fundamental frequency values.
+        time (numpy.ndarray): The time instances corresponding to the computed F0 values.
+        strength (numpy.ndarray): The pitch strength values.
+    Methods:
+        __init__(sample, plim=(30, 500), hop_size=512, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
+            Initializes the FundamentalFrequency object with the given parameters and computes F0.
+        calculate_f0():
+            Computes the fundamental frequency (F0) using the SWIPE' algorithm.
+        get_f0():
+            Returns the computed fundamental frequency values.
+        get_time():
+            Returns the time instances corresponding to the computed F0 values.
+        get_strength():
+            Returns the pitch strength values.
+        get_sampling_rate():
+            Returns the sampling rate of the input audio sample.
+    """
 
-    def __init__(self, sample, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
+    def __init__(self, sample, plim=(30, 500), hop_size=512, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
         """
         Initialize with a VoiceSample, Preemphasis, or SignalNormalization object.
-`
+
         Parameters:
         - sample   : VoiceSample or derived class (Preemphasis, SignalNormalization)
         - plim     : Tuple (min_freq, max_freq) for pitch search range
@@ -58,8 +85,6 @@ class FundamentalFrequency:
         return self.fs
     
 def main():
-    """Main function to demonstrate the usage of FundamentalFrequency class."""
-    #folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
     folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
     preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))
     segment = sg.from_voice_sample(preprocessed_sample, winlen=512, winover=496, wintype='hamm')
