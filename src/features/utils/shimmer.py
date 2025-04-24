@@ -15,6 +15,9 @@ def shimmerAPQ(folder_path, n_points=5, plim=(30, 500), sTHR=0.5, winlen = 512, 
         n_points (int): Number of points in local averaging window (e.g., 3 for APQ3, 5 for APQ5).
         plim (tuple): F0 pitch range (Hz).
         sTHR (float): Voicing threshold for F0 tracking.
+        winlen (int): Window length for segmentation.
+        winover (int): Window overlap for segmentation.
+        wintype (str): Window type for segmentation.
 
     Returns:
         float: shimmer APQ-N value
