@@ -3,7 +3,30 @@ import matplotlib.pyplot as plt
 from .sample import VoiceSample
 
 class Preprocessed(VoiceSample):
-    """Preprocessing applied to VoiceSample class"""
+    """
+    The `Preprocessed` class represents a preprocessed version of a voice sample, 
+    extending the `VoiceSample` class. It includes functionality for normalization 
+    and pre-emphasis of the waveform.
+    Attributes:
+        x (numpy.ndarray): The original waveform of the voice sample.
+        fs (int): The sampling rate of the voice sample.
+        xnorm (numpy.ndarray): The normalized waveform. Defaults to the original waveform if not provided.
+        preem (numpy.ndarray): The pre-emphasized waveform. Defaults to the original waveform if not provided.
+        alpha (float): The pre-emphasis coefficient. Defaults to 0.94.
+    Methods:
+        from_voice_sample(cls, voice_sample, alpha=0.94):
+            Creates a `Preprocessed` object from a `VoiceSample` object by applying 
+            normalization and pre-emphasis.
+        get_preemphasis(alpha=None):
+            Returns the pre-emphasized waveform as a NumPy array. If an `alpha` value 
+            is provided, it applies pre-emphasis with the given coefficient.
+        get_normalization():
+            Returns the normalized waveform as a NumPy array.
+        get_waveform():
+            Returns the original waveform as a NumPy array.
+        get_sampling_rate():
+            Returns the sampling rate of the voice sample.
+    """
     def __init__(self, x, fs, xnorm, preem, alpha=0.94):
         super().__init__(x, fs)
         self.xnorm = xnorm if xnorm is not None else x  # Default to x if not provided
