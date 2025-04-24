@@ -7,7 +7,30 @@ from data.containers.segmentation import Segmented
 
 
 class FormantFrequencies(Segmented):
-    '''Class to compute F1 and F2 frormant frequencies'''
+    """
+    FormantFrequencies is a class for extracting and managing formant frequencies from segmented voice data.
+    Formants are resonant frequencies of the vocal tract, and this class provides methods to calculate and retrieve
+    formant frequencies from raw, pre-emphasized, and normalized voice segments.
+    Attributes:
+        formants (numpy.ndarray): A 3D array containing formant frequencies for raw, pre-emphasized, and normalized
+                                  voice segments. The shape is (N, 3, 3), where N is the number of segments, and the
+                                  second and third dimensions correspond to the first three formants (F1, F2, F3) and
+                                  the type of segment (raw, pre-emphasized, normalized), respectively.
+    Methods:
+        __init__(fs, formants):
+            Initializes the FormantFrequencies object with a sampling rate and formant frequencies.
+        from_voice_sample(segments):
+            Class method to create an instance of FormantFrequencies by extracting formant frequencies from
+            segmented voice data.
+        get_formants():
+            Returns the numpy array of formants extracted from the raw waveform.
+        get_formants_preem():
+            Returns the numpy array of formants extracted from the pre-emphasized waveform.
+        get_formants_norm():
+            Returns the numpy array of formants extracted from the normalized waveform.
+        get_sampling_rate():
+            Returns the sampling rate of the voice data.
+    """
     def __init__(self, fs, formants):
         super().__init__(None, fs, None, None, None, None, None, None, None)
         self.formants = formants
@@ -45,7 +68,6 @@ class FormantFrequencies(Segmented):
         rts_x = np.zeros((N,3))
         rts_x_preem = np.zeros((N,3))
         rts_x_norm= np.zeros((N,3))
-        #TODO: Zatial len formantu, sirka pasem mozno potom,
         
         for i in range(N):
             #Findiung roots of nominator of transfer function
@@ -68,7 +90,6 @@ class FormantFrequencies(Segmented):
             sort_F_preem = sorted(tempF_x_preem)
             sort_F_norm = sorted(tempF_x_norm)
             
-            #TODO: Bandwidths of formants are not calculated yet
             if sort_F == []:    
                 sort_F = np.zeros(3)
                 sort_F_preem = np.zeros(3)
