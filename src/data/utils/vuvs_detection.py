@@ -6,7 +6,34 @@ from data.containers.segmentation import Segmented as sg
 from data.utils.vuvs_gmm import vuvs_gmm
  
 class Vuvs:
-    """Class to detect voiced/unvoiced/scilence segments in an audio signal using GMM."""
+    """
+    The Vuvs class is designed to analyze voiced, unvoiced, and silence segments in an audio signal. 
+    It uses Gaussian Mixture Models (GMM) to compute these segments and provides methods to retrieve 
+    various statistics about silence durations and counts.
+    Attributes:
+        segment (array-like): The original audio segment.
+        segment_preem (array-like): The pre-emphasized audio segment.
+        segment_norm (array-like): The normalized audio segment.
+        fs (int): The sampling rate of the audio signal.
+        winlen (int): The length of the analysis window in samples. Default is 512.
+        winover (int): The overlap between consecutive windows in samples. Default is 496.
+        wintype (str): The type of window to apply (e.g., 'hann'). Default is 'hann'.
+        smoothing_window (int): The size of the smoothing window for post-processing. Default is 5.
+        vuvs (array-like): The computed voiced/unvoiced/silence segments.
+    Methods:
+        calculate_vuvs():
+            Compute the voiced/unvoiced/silence segments using a GMM-based approach.
+        get_vuvs():
+            Retrieve the computed voiced/unvoiced/silence segments.
+        get_sampling_rate():
+            Retrieve the sampling rate of the audio signal.
+        get_total_silence_duration(min_silence_duration_ms=50):
+            Calculate the total duration (in seconds) of silences longer than a specified threshold.
+        get_silence_count(min_silence_duration_ms=50):
+            Count the number of silent segments longer than a specified threshold.
+        get_silence_durations(min_silence_duration_ms=50):
+            Retrieve a list of durations (in seconds) for all silences longer than a specified threshold.
+    """
     
     def __init__(self, segment, fs, winlen = 512, winover = 496, wintype = 'hann', smoothing_window=5):
         self.segment = segment.get_segment()
@@ -22,7 +49,19 @@ class Vuvs:
         self.vuvs = self.calculate_vuvs()
         
     def calculate_vuvs(self):
-        """Compute voiced/unvoiced/scilence segments using GMM."""
+        """
+        Calculate the voiced/unvoiced segments (VUVs) of an audio signal.
+        This method uses a Gaussian Mixture Model (GMM) to determine the voiced 
+        and unvoiced segments of the audio signal based on the provided parameters.
+        Returns:
+            list: A list of VUVs detected in the audio signal.
+        Notes:
+            - The method relies on the `vuvs_gmm` function, which performs the 
+              actual VUV detection.
+            - The detection process uses the attributes `segment`, `fs`, 
+              `winover`, and `smoothing_window` of the class instance.
+        """
+        
         return vuvs_gmm(self.segment, self.fs, self.winover, self.smoothing_window)
 
     def get_vuvs(self):
