@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from .sample import VoiceSample
 
 class Preprocessed(VoiceSample):
-    """Preprocessing applied to VoiceSample"""
+    """Preprocessing applied to VoiceSample class"""
     def __init__(self, x, fs, xnorm, preem, alpha=0.94):
         super().__init__(x, fs)
         self.xnorm = xnorm if xnorm is not None else x  # Default to x if not provided
