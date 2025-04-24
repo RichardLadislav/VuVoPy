@@ -6,15 +6,26 @@ from data.utils.vuvs_detection import Vuvs as vuvs
 
 def ppr(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
     """
+    This function processes an audio file to determine the proportion of silence in the signal. 
+    It uses a windowing approach to segment the audio and applies voice activity detection 
+    to classify segments as silent or non-silent.
+    - folder_path : str
+        Path to the audio file.
+    - winlen : int, optional, default=512
+        Length of the window for segmentation.
+    - winover : int, optional, default=496
+        Overlap between consecutive windows.
+    - wintype : str, optional, default='hamm'
+        Type of windowing function ('hann', 'hamm', 'blackman', 'square').
+    - float
+        Percentage of silence in the audio signal.
+    Notes:
+    - The function relies on external modules for preprocessing, segmentation, and voice activity detection.
+    - Ensure the input audio file is in a compatible format (e.g., WAV).
+    - The accuracy of the silence percentage depends on the quality of the voice activity detection algorithm.
     Calculate the percentage of silence in an audio signal.
     This function processes an audio file to determine the proportion of    
     silence in the signal. It uses a windowing approach to segment the audio
-    
-    Parameters:
-    - folder_path : str : Path to the audio file.
-    - winlen      : int : Length of the window for segmentation.
-    - winover     : int : Overlap between consecutive windows.
-    - wintype     : str : Type of windowing function ('hann', 'hamm', 'blackman', 'square').
     
     Returns:
     - float : Percentage of silence in the audio signal.
