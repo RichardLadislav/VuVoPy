@@ -4,15 +4,26 @@ from scipy.stats import mode
 
 def vuvs_gmm(segments, sr, winover, smoothing_window=5):
     """
-    Classify segments of an audio signal as voiced, unvoiced, or silence using Gaussian Mixture Models (GMM).
-    
+    Classifies audio frames into voiced, unvoiced, or silence using Gaussian Mixture Models (GMMs) 
+    and applies smoothing and post-processing rules to refine the classification.
     Parameters:
-    - y : np.ndarray : Audio signal.
-    - sr : int : Sampling rate.
-    - smoothing_window : int : Size of the smoothing window for the GMM classification.
-    
+        segments (numpy.ndarray): A 2D array of audio frames with shape (num_frames, frame_length).
+        sr (int): Sampling rate of the audio signal in Hz.
+        winover (int): Overlap between consecutive frames in samples.
+        smoothing_window (int, optional): Window size for smoothing the classification labels. 
+                                           Defaults to 5.
     Returns:
-    - np.ndarray : Array of classified segments (0: unvoiced, 1: voiced, 2: silence).
+        numpy.ndarray: An array of labels for each frame, where:
+                       0 = silence,
+                       1 = unvoiced,
+                       2 = voiced.
+    Notes:
+        - The function extracts features such as energy, high-to-low frequency ratio, 
+          normalized autocorrelation coefficient, and zero-crossing rate for each frame.
+        - Two GMMs are used: the first separates voiced frames from unvoiced/silence, 
+          and the second separates unvoiced from silence.
+        - Smoothing is applied to reduce noise in the classification labels.
+        - Post-processing rules are applied to handle short segments and ensure temporal consistency.
     """
 
     features = []
