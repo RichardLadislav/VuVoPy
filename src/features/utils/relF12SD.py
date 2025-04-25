@@ -5,10 +5,21 @@ from data.containers.segmentation import Segmented as sg
 from data.utils.formant_frequencies import FormantFrequencies as ff
 
 def relF1SD(folder_path, winlen = 512, winover = 256, wintype = 'hann'):
-
+    """
+    Computes the relative standard deviation of the first formant frequency (F1) 
+    from a voice sample.
+    Parameters:
+    -----------
+    folder_path : str
+        Path to the folder containing the voice sample in WAV format.
+    winlen : int, optional
+        Length of the analysis window in samples (default is 512).
+    winover : int, optional
+        Overlap between consecutive windows in samples (default is 256).
+    wintype : str, optional
+    """
     formant_freqs = ff.from_voice_sample(sg.from_voice_sample(pp.from_voice_sample(vs.from_wav(folder_path)),winlen, wintype ,winover))
     return np.mean(formant_freqs.get_formants_preem()[:,0])/np.std(formant_freqs.get_formants_preem()[:,0])
-#def relF1SD(segments, fs, formants):
 
 def relF2SD(folder_path, winlen = 512, winover = 256, wintype = 'hann'):
 

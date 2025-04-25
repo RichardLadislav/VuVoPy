@@ -6,18 +6,36 @@ from data.utils.fundamental_frequency import FundamentalFrequency as ff
 
 def hnr(folder_path, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
     """
-    Compute Harmonics-to-Noise Ratio (HNR) using the FundamentalFrequency class for F0 estimation.
-
+    Compute the Harmonics-to-Noise Ratio (HNR) of an audio signal.
+    HNR is a measure of the ratio of harmonic sound to noise in a signal, 
+    often used in speech analysis to assess voice quality.
     Parameters:
-    - folder_path: Path to the audio file  
-    - winlen: Frame length in frames (default: 512)
-    - winover: Overlap in frames (default: 256)
-    - wintype: Window type (default: "hann")
-    - f0_min: Minimum fundamental frequency (Hz)
-    - f0_max: Maximum fundamental frequency (Hz)
-
+    -----------
+    folder_path : str
+        Path to the audio file in WAV format.
+    plim : tuple, optional
+        Pitch range limits in Hz (default is (30, 500)).
+    hop_size : int, optional
+        Hop size for analysis in samples (default is 512).
+    dlog2p : float, optional
+        Logarithmic pitch step size (default is 1/96).
+    dERBs : float, optional
+        Step size in Equivalent Rectangular Bandwidths (default is 0.1).
+    sTHR : float, optional
+        Silence threshold in dB (default is -np.inf).
     Returns:
-    - Mean HNR value across frames
+    --------
+    float
+        The average HNR value of the audio signal. Returns NaN if no valid 
+        HNR values are computed.
+    Notes:
+    ------
+    - The function preprocesses the audio signal and computes the fundamental 
+      frequency using a pitch estimation algorithm.
+    - HNR is calculated for each valid fundamental frequency value and averaged 
+      across the signal.
+    - Values below 40 Hz or invalid frequencies (e.g., NaN or non-positive) 
+      are excluded from the computation.
     """
 
     # Load and preprocess the audio file

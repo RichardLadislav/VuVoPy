@@ -10,6 +10,7 @@ def relSEOSD(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
     """
     Computes the relative standard deviation of the root mean square (RMS) energy 
     contour of a voice sample after silence removal.
+
     Parameters:
     -----------
         folder_path : str
@@ -20,6 +21,7 @@ def relSEOSD(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
             Overlap between consecutive windows in samples. Default is 496.
         wintype : str, optional
             Type of window function to apply (e.g., 'hamm' for Hamming window). Default is 'hamm'.
+
     Returns:
     --------
     float

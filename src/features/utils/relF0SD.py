@@ -5,16 +5,28 @@ from data.utils.fundamental_frequency import FundamentalFrequency as f0
 
 def relF0SD(folder_path, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
     """
-    Calculate the relative standard deviation of the first formant frequency.
-
-    Parameters:
-    - folder_path : str : Path to the audio file.
-    - plim        : tuple : Tuple (min_freq, max_freq) for pitch search range.
-    - hop_size    : int   : Time step for analysis (seconds).
-    - dlog2p      : float : Resolution of pitch candidates.
-    - dERBs       : float : Frequency resolution in ERBs.
-    - sTHR        : float : Pitch strength threshold.
-
+    Calculate the relative standard deviation of the fundamental frequency (F0).
+    This function computes the relative standard deviation (mean divided by standard deviation) 
+    of the fundamental frequency (F0) extracted from an audio file.
+    - folder_path : str
+        Path to the audio file.
+    - plim : tuple, optional
+        Tuple (min_freq, max_freq) specifying the pitch search range in Hz. Default is (30, 500).
+    - hop_size : int, optional
+        Time step for analysis in samples. Default is 512.
+    - dlog2p : float, optional
+        Resolution of pitch candidates in log2 space. Default is 1/96.
+    - dERBs : float, optional
+        Frequency resolution in ERBs. Default is 0.1.
+    - sTHR : float, optional
+        Pitch strength threshold. Default is -np.inf.
+    - float
+        Relative standard deviation of the fundamental frequency (mean divided by standard deviation).
+    Notes:
+    - The function assumes the presence of a `f0` function and a `vs.from_wav` method for extracting 
+      the fundamental frequency from the audio file. Ensure these dependencies are properly defined 
+      and imported.
+    - The input audio file must be in a format supported by the `vs.from_wav` method.
     Returns:
     - float : Relative standard deviation of thefundamental frequency.
     """
