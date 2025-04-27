@@ -27,11 +27,3 @@ def durmad(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
     labels = vuvs(segment, fs=fs, winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
     silence_dur = labels.get_silence_durations()
     return np.mean(np.abs(silence_dur - np.median(silence_dur)))
-
-def main():
-    folder_path = "file_path_here"
-    out = durmad(folder_path)
-    print(f"absolute median {out}s")
-
-if __name__ == "__main__":
-    main()

@@ -7,7 +7,7 @@ Submodules
 VuVoPy.src.VuVoPy.features.utils.durmad module
 ----------------------------------------------
 
-.. autofunction:: VuVoPy.src.VuVoPy.features.utils.durmad
+.. automodule:: VuVoPy.src.VuVoPy.features.utils.durmad
    :members:
    :show-inheritance:
    :undoc-members:

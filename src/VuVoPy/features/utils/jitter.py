@@ -6,7 +6,7 @@ from VuVoPy.data.containers.segmentation import Segmented as sg
 from VuVoPy.data.utils.vuvs_detection import Vuvs as vuvs
 from VuVoPy.data.containers.voiced_sample import VoicedSample as vos
 
-def jiterPPQ(folder_path, n_points = 3, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
+def jitterPPQ(folder_path, n_points = 3, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
     """
     Calculate the Pitch Perturbation Quotient (PPQ) jitter for a given audio file.
     This function computes the jitter based on the fundamental frequency (F0) 
