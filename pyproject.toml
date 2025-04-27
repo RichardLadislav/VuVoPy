@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "VuVoPy"
+version = "0.1.0"
+description = "Library for voice signal parametrization"
+authors = [
+    { name="Richard Ladislav", email="xladis00@vut.com" }
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    # List your dependencies here, example:
+    "numpy",
+    "pandas",
+    "scipy",
+    "librosa",
+    "matplotlib",
+    "sklearn",
+    "scipy",
+    "sympy",
+    "math"
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]

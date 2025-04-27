@@ -119,7 +119,7 @@ src.features.utils.relSEOSD module
 src.features.utils.shimmer module
 ---------------------------------
 
-.. autofunction:: src.features.utils.shimmer
+.. automodule:: src.features.utils.shimmer
    :members:
    :show-inheritance:
    :undoc-members:
