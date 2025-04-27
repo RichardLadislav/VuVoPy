@@ -9,7 +9,10 @@ requires = [
     "numpy",
     "pandas",
     "scipy",
-    "librosa"
+    "librosa",
+    "matplotlib",
+    "scikit-learn",
+    "sympy",
     #add all pips at the end of the 
 
 ]
@@ -17,7 +20,7 @@ requires = [
 # Prepare the setup
 setup(
     name="VuVoPy",
-    version="0.0.1",
+    version="0.1.0",
     description="Voice features",
     long_description=long_description,
     long_description_content_type="text/markdown",

@@ -1,0 +1,25 @@
+Metadata-Version: 2.4
+Name: VuVoPy
+Version: 0.1.0
+Summary: Library for voice signal parametrization
+Home-page: https://github.com/RichardLadislav/VuVoPy
+Author: Richard Ladislav
+Author-email: Richard Ladislav <xladis00@vut.com>
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: scipy
+Requires-Dist: librosa
+Requires-Dist: matplotlib
+Requires-Dist: scikit-learn
+Requires-Dist: sympy
+Dynamic: author
+Dynamic: home-page
+Dynamic: requires-python
+
+# VuVoPy
+
+## VUT Voice Python installable package
+
+Whole README will be added later
