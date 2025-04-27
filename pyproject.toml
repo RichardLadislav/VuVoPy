@@ -19,10 +19,8 @@ dependencies = [
     "scipy",
     "librosa",
     "matplotlib",
-    "sklearn",
-    "scipy",
+    "scikit-learn",
     "sympy",
-    "math"
 ]
 
 [tool.setuptools]

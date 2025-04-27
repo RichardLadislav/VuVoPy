@@ -11,10 +11,8 @@ requires = [
     "scipy",
     "librosa",
     "matplotlib",
-    "sklearn",
-    "scipy",
+    "scikit-learn",
     "sympy",
-    "math"
     #add all pips at the end of the 
 
 ]
