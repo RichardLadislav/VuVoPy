@@ -1,5 +1,5 @@
-VuVoPy.src.data package
-=======================
+src.features package
+====================
 
 Subpackages
 -----------
@@ -7,13 +7,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   VuVoPy.src.data.containers
-   VuVoPy.src.data.utils
+   src.features.utils
 
 Module contents
 ---------------
 
-.. automodule:: VuVoPy.src.data
+.. automodule:: src.features
    :members:
    :show-inheritance:
    :undoc-members:

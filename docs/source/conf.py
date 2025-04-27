@@ -8,7 +8,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../../src')) # Adjust the path to include the parent directory of 'src'
+sys.path.insert(0, os.path.abspath('../..')) # Adjust the path to include the parent directory of 'src'
 project = 'VuVoPy'
 copyright = '2025, Richard Ladislav'
 author = 'Richard Ladislav'
@@ -17,8 +17,9 @@ release = '0.1.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon", "sphinx.ext.viewcode", "sphinx.ext.autosummary"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode","sphinx.ext.napoleon", "sphinx.ext.autosummary"]
 
+autosummary_generate = True  # Automatically generate summary tables for modules
 templates_path = ['_templates']
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 

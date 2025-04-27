@@ -8,6 +8,22 @@ from data.containers.voiced_sample import VoicedSample as vos
 
 def shimmerAPQ(folder_path, n_points=5, plim=(30, 500), sTHR=0.5, winlen = 512, winover = 496 , wintype = 'hamm'):
     """
+    :param folder_path: Path to the .wav file.
+    :type folder_path: str
+    :param n_points: Number of points in the local averaging window (e.g., 3 for APQ3, 5 for APQ5).
+    :type n_points: int
+    :param plim: F0 pitch range in Hz.
+    :type plim: tuple
+    :param sTHR: Voicing threshold for F0 tracking.
+    :type sTHR: float
+    :param winlen: Window length for segmentation.
+    :type winlen: int
+    :param winover: Window overlap for segmentation.
+    :type winover: int
+    :param wintype: Window type for segmentation.
+    :type wintype: str
+    :returns: Shimmer APQ-N value.
+    :rtype: float
     Calculate shimmer APQ-N: amplitude perturbation quotient over N-point window.
 
     Args:

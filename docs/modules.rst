@@ -1,7 +1,7 @@
-VuVoPy
-======
+src
+===
 
 .. toctree::
    :maxdepth: 4
 
-   VuVoPy
+   src

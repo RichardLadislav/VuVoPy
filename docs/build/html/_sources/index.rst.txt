@@ -16,18 +16,10 @@ documentation for details.
    :caption: Contents:
 
    modules
-
+   
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex` 
 * :ref:`search` 
-
-Module Reference
-=================
-
-.. automodule:: VuVoPy.src
-   :members:
-   :undoc-members:
-   :show-inheritance:
