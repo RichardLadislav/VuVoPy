@@ -1,0 +1,315 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VuVoPy.src.VuVoPy.data.utils.swipep &mdash; VuVoPy 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../../index.html" class="icon icon-home">
+            VuVoPy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../../modules.html">VuVoPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../../index.html">VuVoPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">VuVoPy.src.VuVoPy.data.utils.swipep</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for VuVoPy.src.VuVoPy.data.utils.swipep</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">m</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sym</span> 
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">spectrogram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">CubicSpline</span>
+
+<div class="viewcode-block" id="swipep">
+<a class="viewcode-back" href="../../../../../../VuVoPy.src.VuVoPy.data.utils.html#VuVoPy.src.VuVoPy.data.utils.swipep.swipep">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">swipep</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">fs</span><span class="p">,</span><span class="n">plim</span><span class="p">,</span><span class="n">hop_size</span><span class="p">,</span><span class="n">dlog2p</span><span class="p">,</span><span class="n">dERBs</span><span class="p">,</span><span class="n">sTHR</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     Perform the SWIPE&#39; (Sawtooth Waveform Inspired Pitch Estimator) algorithm </span>
+<span class="sd">     for pitch estimation in a given audio signal.</span>
+<span class="sd">     Parameters:</span>
+<span class="sd">     -----------</span>
+<span class="sd">     x : ndarray</span>
+<span class="sd">         Input audio signal (1D array).</span>
+<span class="sd">     fs : float</span>
+<span class="sd">         Sampling frequency of the audio signal (in Hz).</span>
+<span class="sd">     plim : tuple</span>
+<span class="sd">         Pitch range as a tuple (min_pitch, max_pitch) in Hz.</span>
+<span class="sd">     hop_size : float</span>
+<span class="sd">         Hop size for analysis (in samples).</span>
+<span class="sd">     dlog2p : float</span>
+<span class="sd">         Step size for pitch candidates in log2 scale.</span>
+<span class="sd">     dERBs : float</span>
+<span class="sd">         Step size for Equivalent Rectangular Bandwidth (ERB) spaced frequencies.</span>
+<span class="sd">     sTHR : float</span>
+<span class="sd">         Threshold for pitch strength to consider a valid pitch.</span>
+<span class="sd">     Returns:</span>
+<span class="sd">     --------</span>
+<span class="sd">     p : ndarray</span>
+<span class="sd">         Estimated pitch values (in Hz) for each time frame.</span>
+<span class="sd">     t : ndarray</span>
+<span class="sd">         Time vector corresponding to the pitch estimates (in seconds).</span>
+<span class="sd">     s : ndarray</span>
+<span class="sd">         Pitch strength values for each time frame.</span>
+<span class="sd">     Notes:</span>
+<span class="sd">     ------</span>
+<span class="sd">     - The function uses a multi-resolution analysis approach to estimate pitch.</span>
+<span class="sd">     - It computes pitch candidates, their strengths, and refines the pitch </span>
+<span class="sd">       estimates using parabolic interpolation.</span>
+<span class="sd">     - The algorithm is robust to noise and works well for a wide range of </span>
+<span class="sd">       pitch frequencies.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">hop_size</span> <span class="o">/</span> <span class="n">fs</span>  <span class="c1"># Time step for analysis (seconds)</span>
+    <span class="n">t</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="n">fs</span><span class="p">,</span> <span class="n">dt</span><span class="p">)</span><span class="c1"># time vektor</span>
+    <span class="n">dc</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1">#Hop size </span>
+    <span class="n">K</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1">#Parameter for size window</span>
+
+    <span class="c1">#Define pitch candidates</span>
+    <span class="n">log2pc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">plim</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">plim</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dlog2p</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> 
+    <span class="n">pc</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">log2pc</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">pc</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)))</span> <span class="c1"># Pitch candidate strenght matrix</span>
+
+    <span class="c1"># Determine P2 - WSs</span>
+    <span class="n">divFS</span> <span class="o">=</span> <span class="p">[</span><span class="n">fs</span> <span class="o">/</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">plim</span><span class="p">]</span> <span class="c1">#variable so I can divide by list</span>
+    <span class="n">logWs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">K</span> <span class="o">*</span> <span class="n">df</span><span class="p">))</span> <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">divFS</span><span class="p">]</span>
+    <span class="c1">#ws_arg =  np.arange(logWs[0], logWs[1], -1)</span>
+    <span class="n">ws</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span>  <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">logWs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">logWs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">pO</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">K</span> <span class="o">*</span> <span class="n">fs</span> <span class="o">/</span> <span class="n">ws</span>
+
+    <span class="c1"># Determine window sizes used by each pitch candidate</span>
+    <span class="n">d</span> <span class="o">=</span>  <span class="mi">1</span> <span class="o">+</span> <span class="n">log2pc</span> <span class="o">-</span> <span class="n">m</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">K</span><span class="o">*</span><span class="n">fs</span><span class="o">/</span><span class="n">ws</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="c1"># Create ERBs spaced frequencies (in Hertz)</span>
+    <span class="n">fERBs</span> <span class="o">=</span> <span class="n">erbs2hz</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">hz2erbs</span><span class="p">(</span><span class="n">pc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">4</span><span class="p">),</span> <span class="n">hz2erbs</span><span class="p">(</span><span class="n">fs</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="n">dERBs</span><span class="p">))[:,</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ws</span><span class="p">)):</span>
+        <span class="n">dn</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">dc</span> <span class="o">*</span> <span class="n">fs</span> <span class="o">/</span> <span class="n">pO</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="c1">#Hop size in samples</span>
+        <span class="c1"># Zero pad signal</span>
+        <span class="n">xzp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ws</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,)),</span> <span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dn</span> <span class="o">+</span> <span class="n">ws</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,))])</span>
+        <span class="c1"># Compute spectrum</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hanning</span><span class="p">(</span><span class="n">ws</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="c1"># Hanning window</span>
+        <span class="n">o</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">ws</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">dn</span><span class="p">))</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">ti</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">spectrogram</span><span class="p">(</span><span class="n">xzp</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">nperseg</span><span class="o">=</span><span class="n">ws</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">noverlap</span><span class="o">=</span><span class="n">o</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;complex&#39;</span><span class="p">)</span> 
+        <span class="c1"># Interpolate at eqidistant ERBs steps</span>
+        <span class="c1"># Perform interpolation</span>
+        <span class="c1"># TO DO: ferb je hodnota musim posilat poradi prvku v liste </span>
+        <span class="n">interp_func</span> <span class="o">=</span> <span class="n">CubicSpline</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">extrapolate</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># Calculate the interpolated magnitudes</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">interp_func</span><span class="p">(</span><span class="n">fERBs</span><span class="p">)</span> <span class="p">)</span>  <span class="c1"># Ensure non-negative values</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">M</span><span class="p">)</span><span class="c1"># </span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ms</span><span class="p">)</span> <span class="k">for</span> <span class="n">ms</span> <span class="ow">in</span> <span class="n">M</span><span class="p">]</span><span class="c1"># Loudness</span>
+        <span class="c1"># Select candidates that use this window size </span>
+        <span class="c1"># Loop over window </span>
+        <span class="c1"># Select candidates that use this window size</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+             <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+             <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+             <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+             <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+             <span class="n">j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">d</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+             <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">j</span><span class="p">))</span>   
+
+        <span class="n">Si</span> <span class="o">=</span> <span class="n">pitchStrengthAllCandidates</span><span class="p">(</span><span class="n">fERBs</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">pc</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+         <span class="c1"># Pitch strength for selected candidates</span>
+        <span class="c1"># Interpolate at desired times</span>
+        <span class="k">if</span> <span class="n">Si</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+           <span class="n">Si</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">Si</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">posinf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">neginf</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+           <span class="n">interp_func</span> <span class="o">=</span> <span class="n">CubicSpline</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="n">Si</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">extrapolate</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+           <span class="c1">#Si = [interp_func(i) for i in t]</span>
+           <span class="n">Si</span> <span class="o">=</span> <span class="n">interp_func</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> 
+        <span class="k">else</span><span class="p">:</span>
+           <span class="n">Si</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">Si</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="c1"># Calculate lambda and mu for weighting</span>
+        <span class="n">lambda_</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">j</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span> <span class="o">-</span> <span class="n">i</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">mu</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lambda_</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="c1"># Update pitch strength matrix</span>
+        <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Si</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> <span class="o">*</span> <span class="n">Si</span><span class="o">.</span><span class="n">T</span>
+        <span class="c1">#S[j, :] += (mu * Si.T).T</span>
+    <span class="c1"># Initialize pitch and strength ys with NaN</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+    <span class="c1"># Loop over each time frame</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="c1"># Find the maximum strength and its index</span>
+        <span class="n">s</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">S</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">S</span><span class="p">[:,</span> <span class="n">j</span><span class="p">])</span>
+    
+        <span class="c1"># Skip if the strength is below the threshold</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">sTHR</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="c1"># Handle boundary cases</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">pc</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">pc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+             <span class="c1"># Use neighboring points for interpolation</span>
+            <span class="n">I</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># Indices for 3-point interpolation</span>
+            <span class="n">tc</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">pc</span><span class="p">[</span><span class="n">I</span><span class="p">]</span>  <span class="c1"># Convert pitch candidates to periods</span>
+            <span class="n">ntc</span> <span class="o">=</span> <span class="p">(</span><span class="n">tc</span> <span class="o">/</span> <span class="n">tc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>  <span class="c1"># Normalize periods</span>
+            <span class="c1"># Perform parabolic interpolation using polyfit</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">ntc</span><span class="p">),</span> <span class="n">S</span><span class="p">[</span><span class="n">I</span><span class="p">,</span> <span class="n">j</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="c1"># Generate fine-tuned frequency candidates for interpolation</span>
+            <span class="n">ftc</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">2.0</span><span class="o">**</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">pc</span><span class="p">[</span><span class="n">I</span><span class="p">[</span><span class="mi">0</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">pc</span><span class="p">[</span><span class="n">I</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">64</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">12</span><span class="o">/</span><span class="mi">64</span><span class="p">)</span>
+            <span class="n">nftc</span> <span class="o">=</span> <span class="p">(</span><span class="n">ftc</span> <span class="o">/</span> <span class="n">tc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>  <span class="c1"># Normalize fine-tuned candidates Use the interpolated polynomial to find the fine-tuned maximum</span>
+            <span class="n">s</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">nftc</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">polyval</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">nftc</span><span class="p">))</span>
+            <span class="c1"># Convert the fine-tuned result back to pitch</span>
+            <span class="n">p</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">pc</span><span class="p">[</span><span class="n">I</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">+</span> <span class="p">(</span><span class="n">k</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="mi">64</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">p</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">s</span></div>
+
+
+<div class="viewcode-block" id="pitchStrengthAllCandidates">
+<a class="viewcode-back" href="../../../../../../VuVoPy.src.VuVoPy.data.utils.html#VuVoPy.src.VuVoPy.data.utils.swipep.pitchStrengthAllCandidates">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pitchStrengthAllCandidates</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">L</span><span class="p">,</span><span class="n">pc</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the pitch strength for all candidates.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    f  -- Frequency y</span>
+<span class="sd">    L  -- Loudness y</span>
+<span class="sd">    pc -- Pitch candidates</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    S  -- Pitch salience matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+        <span class="n">L</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">L</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">L</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span> <span class="o">=</span> <span class="kc">True</span><span class="p">))</span>
+    <span class="c1">#Create pitch salience matrix</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">pc</span><span class="p">),</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pc</span><span class="p">)):</span>
+        <span class="n">S</span><span class="p">[</span><span class="n">j</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">pitchStrengthOneCandidate</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">pc</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">S</span></div>
+
+
+<div class="viewcode-block" id="pitchStrengthOneCandidate">
+<a class="viewcode-back" href="../../../../../../VuVoPy.src.VuVoPy.data.utils.html#VuVoPy.src.VuVoPy.data.utils.swipep.pitchStrengthOneCandidate">[docs]</a>
+<span class="k">def</span><span class="w">  </span><span class="nf">pitchStrengthOneCandidate</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">L</span><span class="p">,</span><span class="n">pc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the pitch strength for one pitch candidate.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    f  -- Frequency y</span>
+<span class="sd">    L  -- Loudness y</span>
+<span class="sd">    pc -- Pitch candidate</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    S  -- Pitch strength for this candidate</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">pc</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">))</span> <span class="c1"># Number of harmonics</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c1"># Kernel</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="n">pc</span> <span class="c1">#Normalize frequency  w.r.t candidate</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">sym</span><span class="o">.</span><span class="n">primerange</span><span class="p">(</span><span class="n">n</span><span class="p">)):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="mf">0.25</span> <span class="c1">#Peaks weights</span>
+        <span class="n">k</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">q</span><span class="p">[</span><span class="n">p</span><span class="p">])</span> <span class="o">/</span><span class="mi">2</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.</span> <span class="o">/</span><span class="n">f</span><span class="p">)</span> <span class="c1"># Aplly envelope</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">k</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">])</span> <span class="c1"># K+-normalize kernel</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">L</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">S</span></div>
+
+
+<div class="viewcode-block" id="hz2erbs">
+<a class="viewcode-back" href="../../../../../../VuVoPy.src.VuVoPy.data.utils.html#VuVoPy.src.VuVoPy.data.utils.swipep.hz2erbs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">hz2erbs</span><span class="p">(</span><span class="n">hz</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert frequency in Hz to ERBs.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mf">21.4</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span> <span class="n">hz</span> <span class="o">/</span> <span class="mi">229</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="erbs2hz">
+<a class="viewcode-back" href="../../../../../../VuVoPy.src.VuVoPy.data.utils.html#VuVoPy.src.VuVoPy.data.utils.swipep.erbs2hz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">erbs2hz</span><span class="p">(</span><span class="n">erbs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert ERBs to frequency in Hz.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span> <span class="p">(</span><span class="n">erbs</span> <span class="o">/</span> <span class="mf">21.4</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">229</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Richard Ladislav.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
