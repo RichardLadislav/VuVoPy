@@ -1,6 +1,6 @@
+LICENSE.txt
 README.md
 pyproject.toml
-setup.py
 src/VuVoPy/__init__.py
 src/VuVoPy.egg-info/PKG-INFO
 src/VuVoPy.egg-info/SOURCES.txt

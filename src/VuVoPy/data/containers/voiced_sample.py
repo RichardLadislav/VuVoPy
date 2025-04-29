@@ -157,11 +157,9 @@ def main():
     voiced_sample = VoicedSample(preprocessed_sample, labels, fs).get_voiced_sample()
     stretched_labels = VoicedSample(preprocessed_sample, labels, fs).label_stretch()
     #    Plotting the results
-    plt.figure(figsize=(12, 6))
-    plt.plot(stretched_labels, label='stretched labels')
-    plt.figure(figsize=(12, 6))
-    plt.plot(labels.get_vuvs(), label='origianl labels')
-
+    #plt.figure(figsize=(12, 6))
+    #plt.plot(stretched_labels, label='stretched labels')
+    #plt.plot(labels.get_vuvs(), label='origianl labels')
     plt.figure(figsize=(12, 6))
     plt.plot(voiced_sample, label='voiced signal')
     plt.figure(figsize=(12, 6))
@@ -169,5 +167,6 @@ def main():
     plt.figure(figsize=(12, 6))
     plt.plot(silence_removed_sample, label='voiced signal')
     print("done done doneeee")
+    plt.show(block=True)
 if __name__ == "__main__":
     main()

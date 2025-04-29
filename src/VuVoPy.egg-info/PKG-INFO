@@ -1,12 +1,22 @@
 Metadata-Version: 2.4
 Name: VuVoPy
-Version: 0.1.0
-Summary: Library for voice signal parametrization
-Home-page: https://github.com/RichardLadislav/VuVoPy
-Author: Richard Ladislav
-Author-email: Richard Ladislav <xladis00@vut.com>
+Version: 0.1.0a1
+Summary: Voice features
+Author-email: Richard Ladislav <230106@vut.cz>
+License: MIT
+Project-URL: Homepage, https://github.com/RichardLadislav/VuVoPy
+Keywords: voice,features,speech,parkinson,acoustic-analysis
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Operating System :: OS Independent
 Requires-Python: >=3.7
 Description-Content-Type: text/markdown
+License-File: LICENSE.txt
 Requires-Dist: numpy
 Requires-Dist: pandas
 Requires-Dist: scipy
@@ -14,12 +24,25 @@ Requires-Dist: librosa
 Requires-Dist: matplotlib
 Requires-Dist: scikit-learn
 Requires-Dist: sympy
-Dynamic: author
-Dynamic: home-page
-Dynamic: requires-python
+Dynamic: license-file
 
 # VuVoPy
 
-## VUT Voice Python installable package
+🎙️ **VuVoPy** — Voice Utility Library for Speech Parametrization  
+Fast and flexible extraction of speech features such as jitter, shimmer, HNR, and more.  
+Built for machine learning applications like Parkinson’s disease diagnosis.
 
-Whole README will be added later
+---
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Python](https://img.shields.io/badge/python-3.8%2B-brightgreen.svg)
+![Status](https://img.shields.io/badge/status-active-success.svg)
+
+---
+
+## 📦 Installation
+
+Install VuVoPy easily with `pip`:
+
+```bash
+pip install VuVoPy
