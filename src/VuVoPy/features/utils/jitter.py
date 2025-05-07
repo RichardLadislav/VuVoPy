@@ -30,17 +30,22 @@ def jitterPPQ(folder_path, n_points = 3, plim=(30, 500), hop_size = 512, dlog2p=
     """
     
     fundamental_freq = f0(vs.from_wav(folder_path), plim, hop_size, dlog2p, dERBs, sTHR).get_f0()
+    # Only keep non-zero (voiced) values
+    fundamental_freq = fundamental_freq[fundamental_freq > 0]
     if len(fundamental_freq) < n_points:
-        return 0
-    
-    # Create an array to hold the APQ values
-    jitter_values = []
-    for i in range(len(fundamental_freq) - n_points):
-        avg_f0 = np.mean(fundamental_freq[i:i+n_points])  # Mean F0 over n_points
-        jitter = np.abs(fundamental_freq[i+n_points-1] - avg_f0) / avg_f0  # Normalize by mean F0
-        jitter_values.append(jitter)
+        return 0.0
 
-    return np.mean(jitter_values)  # Return average PPQ
+    k = n_points // 2
+    T = 1 / fundamental_freq  # Convert frequency to period
+    T_bar = np.mean(T)
+
+    jitter_values = []
+    for i in range(k, len(T) - k):
+        local_avg = np.mean(T[i - k:i + k + 1])
+        deviation = abs(T[i] - local_avg) / T_bar
+        jitter_values.append(deviation)
+
+    return float(np.mean(jitter_values))
 
 def main():
     folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"

@@ -50,7 +50,7 @@ class Vuvs:
         
     def calculate_vuvs(self):
         """
-        Calculate the voiced/unvoiced segments (VUVs) of an audio signal.
+        Calculate the voiced/unvoiced segments (VUVS) of an audio signal.
         This method uses a Gaussian Mixture Model (GMM) to determine the voiced 
         and unvoiced segments of the audio signal based on the provided parameters.
         Returns:

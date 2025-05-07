@@ -77,9 +77,14 @@ def main():
     sampling_rate = processed_sample.get_sampling_rate()
 
     print(sampling_rate)
-    plt.plot(original, label="Original")
-    plt.plot(normalized, label="Normalized")
-    plt.plot(preemphasized, label="Pre-emphasized")
+    plt.subplot(3, 1, 1)
+    plt.plot(original, label="Original", color='blue')
+    plt.legend()
+    plt.subplot(3, 1, 2)
+    plt.plot(normalized, label="Normalized", color='orange')
+    plt.legend()
+    plt.subplot(3, 1, 3)
+    plt.plot(preemphasized, label="Pre-emphasized",color='green')
     plt.legend()
     plt.show(block=True)
 if __name__ == "__main__": 

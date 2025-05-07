@@ -3,16 +3,17 @@ from VuVoPy.data.containers.prepocessing import Preprocessed as pp
 from VuVoPy.data.containers.sample import VoiceSample as vs
 from VuVoPy.data.containers.segmentation import Segmented as sg
 from VuVoPy.data.utils.vuvs_detection import Vuvs as vuvs
+
 def mpt(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
     """
-    Computes the Mean Phonation Time (MPT) from a given audio file.
+    Computes the Maximal Phonation Time (MPT) from a given audio file.
     Parameters:
         folder_path (str): The file path to the audio sample in WAV format.
         winlen (int, optional): The length of the analysis window. Default is 512.
         winover (int, optional): The overlap between consecutive windows. Default is 496.
         wintype (str, optional): The type of windowing function to apply (e.g., 'hamm' for Hamming). Default is 'hamm'.
     Returns:
-        float: The Mean Phonation Time (MPT) in seconds, calculated as the total duration of voiced segments.
+        float: The Maximal Phonation Time (MPT) in seconds, calculated as the total duration of voiced segments.
     """
     
     # Load and preprocess the audio sample
