@@ -25,8 +25,14 @@ def relF1SD(folder_path, winlen = 512, winover = 256, wintype = 'hann'):
     float
         The relative standard deviation of the first formant frequency (F1).
     """
-    formant_freqs = ff.from_voice_sample(sg.from_voice_sample(pp.from_voice_sample(vs.from_wav(folder_path)),winlen, wintype ,winover))
-    return np.mean(formant_freqs.get_formants_preem()[:,0])/np.std(formant_freqs.get_formants_preem()[:,0])
+    formant_freqs = ff.from_voice_sample(sg.from_voice_sample(pp.from_voice_sample(vs.from_wav(folder_path)),winlen, wintype ,winover)).get_formants_preem()[:,0]
+    if  formant_freqs.size == 0:
+        return float('nan')  # or `return np.inf` for constant‐F0 case
+    sigma = np.std(formant_freqs)
+    if sigma == 0:
+        return float('nan')
+    mu  = np.mean(formant_freqs)
+    return mu / sigma
 
 def relF2SD(folder_path, winlen = 512, winover = 256, wintype = 'hann'):
     """
@@ -55,8 +61,15 @@ def relF2SD(folder_path, winlen = 512, winover = 256, wintype = 'hann'):
       for accurate results.
     """
 
-    formant_freqs = ff.from_voice_sample(sg.from_voice_sample(pp.from_voice_sample(vs.from_wav(folder_path)),winlen, wintype ,winover))
-    return np.mean(formant_freqs.get_formants_preem()[:,1])/np.std(formant_freqs.get_formants_preem()[:,1])
+    formant_freqs = ff.from_voice_sample(sg.from_voice_sample(pp.from_voice_sample(vs.from_wav(folder_path)),winlen, wintype ,winover)).get_formants_preem()[:,1]
+
+    if  formant_freqs.size == 0:
+        return float('nan')  # or `return np.inf` for constant‐F0 case
+    sigma = np.std(formant_freqs)
+    if sigma == 0:
+        return float('nan')
+    mu  = np.mean(formant_freqs)
+    return mu / sigma
 
 def main():
     folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"

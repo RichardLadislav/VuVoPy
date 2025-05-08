@@ -30,8 +30,14 @@ def relF0SD(folder_path, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1,
     Returns:
     - float : Relative standard deviation of thefundamental frequency.
     """
-    fundamental_freq = f0(vs.from_wav(folder_path), plim, hop_size, dlog2p, dERBs, sTHR)
-    return np.mean(fundamental_freq.get_f0())/np.std(fundamental_freq.get_f0())
+    fundamental_freq = f0(vs.from_wav(folder_path), plim, hop_size, dlog2p, dERBs, sTHR).get_f0()
+    if  fundamental_freq.size == 0:
+        return float('nan')  # or `return np.inf` for constant‐F0 case
+    sigma = np.std(fundamental_freq)
+    if sigma == 0:
+        return float('nan')
+    mu  = np.mean(fundamental_freq)
+    return mu / sigma
 def main():
     folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
     out = relF0SD(folder_path)
