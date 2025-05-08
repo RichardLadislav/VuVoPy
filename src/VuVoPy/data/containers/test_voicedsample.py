@@ -1,9 +1,4 @@
 # tests/test_voicedsample.py
-
-import sys, os
-# HACK: allow pytest to import from src/ until pytest.ini is sorted out
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
-
 import numpy as np
 import pytest
 
@@ -13,6 +8,8 @@ from VuVoPy.data.containers.segmentation import Segmented
 from VuVoPy.data.utils.vuvs_detection import Vuvs
 from VuVoPy.data.containers.voiced_sample import VoicedSample
 
+import sys
+print(sys.path)
 class DummyVuvs:
     """Simple stub that returns a fixed sequence of V/UV labels."""
     def __init__(self, labels):
