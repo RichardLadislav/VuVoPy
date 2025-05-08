@@ -1,30 +1,43 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "VuVoPy"
-version = "0.1.0"
-description = "Library for voice signal parametrization"
-authors = [
-    { name="Richard Ladislav", email="xladis00@vut.com" }
-]
-license = { file = "LICENSE" }
+version = "0.1.0a1"
+description = "Voice features"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.7"
+license = { text = "MIT" }
+authors = [
+  { name = "Richard Ladislav", email = "230106@vut.cz" }
+]
+keywords = ["voice", "features", "speech", "parkinson", "acoustic-analysis"]
 dependencies = [
-    # List your dependencies here, example:
-    "numpy",
-    "pandas",
-    "scipy",
-    "librosa",
-    "matplotlib",
-    "scikit-learn",
-    "sympy",
+  "numpy",
+  "pandas",
+  "scipy",
+  "librosa",
+  "matplotlib",
+  "scikit-learn",
+  "sympy"
+]
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Operating System :: OS Independent"
 ]
 
+[project.urls]
+Homepage = "https://github.com/RichardLadislav/VuVoPy"
+
 [tool.setuptools]
-package-dir = { "" = "src" }
+package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]

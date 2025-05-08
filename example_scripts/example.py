@@ -1,7 +1,9 @@
 import VuVoPy as vp
 import pandas as pd
 
-file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
+# Users should replace the file_path with their own file path
+file_path = "user_path_here.wav"
+
 durmad = vp.durmad(file_path)
 durmed = vp.durmed(file_path)
 duv = vp.duv(file_path)

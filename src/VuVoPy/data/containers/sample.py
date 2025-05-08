@@ -31,3 +31,7 @@ def main():
     fs = aud.get_sampling_rate()
     print(fs)
     plt.plot(x)
+    plt.title("Waveform")
+    plt.show(block=True)
+if __name__ == "__main__":
+    main()

@@ -128,7 +128,8 @@ class FormantFrequencies(Segmented):
         return self.fs
 
 def main():
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
+    #folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
+    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//short_test_database//recordings//K1021//K1021_7.1-3-a_1.wav"
     processed_sample = Preprocessed.from_voice_sample(VoiceSample.from_wav(folder_path))
 
     seg = Segmented.from_voice_sample(processed_sample, winlen=512, winover=256, wintype="hann")

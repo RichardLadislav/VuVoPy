@@ -1,14 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from VuVoPy.data.utils.swipep import swipep
-
-
 from VuVoPy.data.containers.prepocessing import Preprocessed as pp
 from VuVoPy.data.containers.sample import VoiceSample as vs
-#from data.utils.fundamental_frequency import FundamentalFrequency as f0
 from VuVoPy.data.containers.segmentation import Segmented as sg
 from VuVoPy.data.utils.vuvs_detection import Vuvs as vuvs
 from VuVoPy.data.containers.voiced_sample import VoicedSample as vos
+
 class FundamentalFrequency:
     """
     FundamentalFrequency is a class for analyzing and extracting the fundamental frequency (F0) 
@@ -80,17 +78,20 @@ class FundamentalFrequency:
     def get_strength(self):
         """Return pitch strength values."""
         return self.strength
+    
     def get_sampling_rate(self):
         """Return the sampling rate."""
         return self.fs
     
 def main():
     folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
+#    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
     preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))
     segment = sg.from_voice_sample(preprocessed_sample, winlen=512, winover=496, wintype='hamm')
     fs = segment.get_sampling_rate()
     labels = vuvs(segment, fs=fs, winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
     silence_removed_sample = vos(preprocessed_sample, labels, fs)
+    voiced_sample = vos(preprocessed_sample, labels, fs)
     #ff = FundamentalFrequency(vs.from_wav(folder_path),hop_size=127)
     ff = FundamentalFrequency(silence_removed_sample,hop_size=16)
     f0 = ff.get_f0()
