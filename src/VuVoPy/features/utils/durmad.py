@@ -4,7 +4,7 @@ from VuVoPy.data.containers.sample import VoiceSample as vs
 from VuVoPy.data.containers.segmentation import Segmented as sg
 from VuVoPy.data.utils.vuvs_detection import Vuvs as vuvs
 
-def durmad(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
+def durmad(folder_path, winlen=512, winover=496, wintype='hamm'):
     """
     Computes the absolute median deviation of silence durations from a voice sample.
     This function processes a voice sample from a given folder path, segments it
@@ -20,10 +20,27 @@ def durmad(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
     Returns:
         float: The absolute median deviation of silence durations in the voice sample, in seconds.
     """
-    
+    # Preprocess the voice sample
     preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))
     segment = sg.from_voice_sample(preprocessed_sample, winlen, wintype, winover)
     fs = segment.get_sampling_rate()
-    labels = vuvs(segment, fs=fs, winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
+
+    # Perform voiced/unvoiced detection
+    labels = vuvs(
+        segment,
+        fs=fs,
+        winlen=segment.get_window_length(),
+        winover=segment.get_window_overlap(),
+        wintype=segment.get_window_type(),
+        smoothing_window=5
+    )
+
+    # Get silence durations
     silence_dur = labels.get_silence_durations()
+
+    # Handle the case where there are no silence durations
+    if silence_dur.size == 0:  # Correctly check if the array is empty
+        return np.nan
+
+    # Calculate the mean absolute deviation from the median
     return np.mean(np.abs(silence_dur - np.median(silence_dur)))
