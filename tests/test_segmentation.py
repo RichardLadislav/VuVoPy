@@ -47,9 +47,9 @@ def test_segmented_square_window_basic():
 
     # Pre-emphasis was: [0, 1, 0.12, 1.12, 1.18], padded to length 6
     # so frames: [[0,0.12], [1,1.12], [0.12,1.18]]
-    expected_pre = np.array([[0.0,  0.12],
+    expected_pre = np.array([[0.0,  1.06],
                              [1.0,  1.12],
-                             [0.12, 1.18]])
+                             [1.06, 1.18]])
     np.testing.assert_allclose(seg.get_preem_segment(), expected_pre, atol=1e-6)
 
     # Normalization was x / 4 → [0, .25, .5, .75, 1.0], padded to 6

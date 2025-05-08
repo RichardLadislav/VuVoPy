@@ -12,6 +12,7 @@ src/VuVoPy/data/containers/__init__.py
 src/VuVoPy/data/containers/prepocessing.py
 src/VuVoPy/data/containers/sample.py
 src/VuVoPy/data/containers/segmentation.py
+src/VuVoPy/data/containers/test_voicedsample.py
 src/VuVoPy/data/containers/voiced_sample.py
 src/VuVoPy/data/utils/__init__.py
 src/VuVoPy/data/utils/formant_frequencies.py
@@ -36,3 +37,6 @@ src/VuVoPy/features/utils/relf1f2sd.py
 src/VuVoPy/features/utils/relseosd.py
 src/VuVoPy/features/utils/shimmer.py
 src/VuVoPy/features/utils/spir.py
+tests/test_preprocessing.py
+tests/test_sample.py
+tests/test_segmentation.py
