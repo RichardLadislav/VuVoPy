@@ -39,7 +39,7 @@ def durmad(folder_path, winlen=512, winover=496, wintype='hamm'):
     silence_dur = labels.get_silence_durations()
 
     # Handle the case where there are no silence durations
-    if silence_dur.size == 0:  # Correctly check if the array is empty
+    if len(silence_dur) == 0:  # Correctly check if the array is empty
         return np.nan
 
     # Calculate the mean absolute deviation from the median
