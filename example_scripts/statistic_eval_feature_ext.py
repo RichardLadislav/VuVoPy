@@ -2,7 +2,7 @@
 """
 This script extracts speech features from the PARCZ database using VuVoPy,
 reading WAV files organized in subdirectories by speaker code, in parallel,
-with a real-time progress bar using concurrent.futures.
+with a real-time progress bar using concurrent.futures and per-task timeouts.
 
 Directory structure:
   PARCZ_complet/recordings/
@@ -28,14 +28,17 @@ Before running, update the WAV_DIR and OUTPUT_CSV paths below.
 import os
 import VuVoPy as vp
 import pandas as pd
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
 from tqdm import tqdm
 
 # ===== User Configuration =====
 WAV_DIR    = r"C:/Users/Richard Ladislav/Desktop/final countdown/DP-knihovna pro parametrizaci reci - kod/supershort_database"
-OUTPUT_CSV = r"C:/Users/Richard Ladislav/Desktop/final countdown/DP-knihovna pro parametrizaci reci - kod/parcz_features.csv"
-# Number of worker threads (-1 for cpu_count)
-N_WORKERS  = os.cpu_count() or 1
+#WAV_DIR    = r"C:/Users/Richard Ladislav/Desktop/final countdown/DP-knihovna pro parametrizaci reci - kod/PARCZ_complet"
+OUTPUT_CSV = r"C:/Users/Richard Ladislav/Desktop/final countdown/DP-knihovna pro parametrizaci reci - kod/statistics_VuVoPy/parcz_features.csv"
+# Number of worker threads
+N_WORKERS  = min(os.cpu_count() or 1, 8)
+# Timeout per file (seconds)
+TIMEOUT    = 12
 
 
 def process_entry(wav_path, speaker_id, label, gender):
@@ -84,17 +87,34 @@ def main():
                      'M' if len(speaker_id) > 1 and speaker_id[1] == '2' else None)
             entries.append((wav_path, speaker_id, label, gender))
 
-    # 2) Parallel extraction with progress via as_completed
+    # 2) Parallel extraction with progress via as_completed and timeout
     records = []
+    # Map futures to file paths for error handling
     with ThreadPoolExecutor(max_workers=N_WORKERS) as executor:
-        futures = [executor.submit(process_entry, wav, sid, lbl, gdr) for wav, sid, lbl, gdr in entries]
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Extracting features", unit="file"):
-            res = future.result()
+        future_to_path = {
+            executor.submit(process_entry, wav, sid, lbl, gdr): wav
+            for wav, sid, lbl, gdr in entries
+        }
+        for future in tqdm(as_completed(future_to_path), total=len(future_to_path), desc="Extracting features", unit="file"):
+            wav_path = future_to_path[future]
+            try:
+                res = future.result(timeout=TIMEOUT)
+            except TimeoutError:
+                print(f"Timeout processing {wav_path}")
+                continue
+            except Exception as e:
+                print(f"Error processing {wav_path}: {e}")
+                continue
             if res:
                 records.append(res)
 
-    # 3) Build DataFrame and save locally (avoid fsspec issues)
+    # 3) Build DataFrame and save locally
     df = pd.DataFrame.from_records(records)
+    out_dir = os.path.dirname(OUTPUT_CSV)
+    if not os.path.isdir(out_dir):
+        os.makedirs(out_dir, exist_ok=True)
+
+    # Now safe to open
     with open(OUTPUT_CSV, 'w', newline='', encoding='utf-8') as f:
         df.to_csv(f, index=False)
 

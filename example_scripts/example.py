@@ -3,21 +3,21 @@ import pandas as pd
 
 # Users should replace the file_path with their own file path
 #file_path = "user_path_here.wav"
-file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//short_test_database//recordings//K1021//K1021_7.1-3-a_1.wav"
-
-durmad = vp.durmad(file_path)
-durmed = vp.durmed(file_path)
-duv = vp.duv(file_path)
+#file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//short_test_database//recordings//K1021//K1021_7.1-3-a_1.wav"
+file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//short_test_database//P2111_9.4_1.wav"
+durmad = vp.durmad(file_path,winlen=512,winover=256,wintype='hamm')
+durmed = vp.durmed(file_path,winlen=512,winover=256,wintype='hamm')
+duv = vp.duv(file_path,winlen=512,winover=256,wintype='hamm')
 hnr = vp.hnr(file_path)
 jitter = vp.jitterPPQ(file_path)
-mpt = vp.mpt(file_path)
-ppr =vp.ppr(file_path)
+mpt = vp.mpt(file_path,winlen=512,winover=256,wintype='hamm')
+ppr =vp.ppr(file_path,winlen=512,winover=256,wintype='hamm')
 relf0sd = vp.relF0SD(file_path)
-relf1sd = vp.relF1SD(file_path)
+relf1sd = vp.relF1SD(file_path,winlen=512,winover=256,wintype='hamm')
 relf2sd = vp.relF2SD(file_path)
-relseosd = vp.relSEOSD(file_path)
+relseosd = vp.relSEOSD(file_path,winlen=512,winover=256,wintype='hamm')
 shimmer = vp.shimmerAPQ(file_path)
-spir = vp.spir(file_path)
+spir = vp.spir(file_path, winlen=512,winover=256,wintype='hamm')
 
 data = {
     "durmad": [durmad],
