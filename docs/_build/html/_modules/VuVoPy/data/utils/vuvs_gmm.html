@@ -1,0 +1,223 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VuVoPy.data.utils.vuvs_gmm &mdash; VuVoPy 0.0.2a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=21daeed8"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            VuVoPy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">VuVoPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">VuVoPy.data.utils.vuvs_gmm</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for VuVoPy.data.utils.vuvs_gmm</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.mixture</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaussianMixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">mode</span>
+
+<div class="viewcode-block" id="vuvs_gmm">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.vuvs_gmm.vuvs_gmm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">vuvs_gmm</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">sr</span><span class="p">,</span> <span class="n">winover</span><span class="p">,</span> <span class="n">smoothing_window</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Classifies audio frames into voiced, unvoiced, or silence using Gaussian Mixture Models (GMMs) </span>
+<span class="sd">    and applies smoothing and post-processing rules to refine the classification.</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        segments (numpy.ndarray): A 2D array of audio frames with shape (num_frames, frame_length).</span>
+<span class="sd">        sr (int): Sampling rate of the audio signal in Hz.</span>
+<span class="sd">        winover (int): Overlap between consecutive frames in samples.</span>
+<span class="sd">        smoothing_window (int, optional): Window size for smoothing the classification labels. </span>
+<span class="sd">                                           Defaults to 5.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: An array of labels for each frame, where:</span>
+<span class="sd">                       0 = silence,</span>
+<span class="sd">                       1 = unvoiced,</span>
+<span class="sd">                       2 = voiced.</span>
+<span class="sd">    Notes:</span>
+<span class="sd">        - The function extracts features such as energy, high-to-low frequency ratio, </span>
+<span class="sd">          normalized autocorrelation coefficient, and zero-crossing rate for each frame.</span>
+<span class="sd">        - Two GMMs are used: the first separates voiced frames from unvoiced/silence, </span>
+<span class="sd">          and the second separates unvoiced from silence.</span>
+<span class="sd">        - Smoothing is applied to reduce noise in the classification labels.</span>
+<span class="sd">        - Post-processing rules are applied to handle short segments and ensure temporal consistency.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">features</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">frame_length</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">segments</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># Transpose to iterate over frames</span>
+
+    <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">:</span>
+        <span class="n">spectrum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfft</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">frame_length</span><span class="p">))</span>
+        <span class="n">freqs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfftfreq</span><span class="p">(</span><span class="n">frame_length</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">sr</span><span class="p">)</span>
+
+        <span class="c1"># E: Frame energy above 200 Hz</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">freqs</span> <span class="o">&gt;</span> <span class="mi">200</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span>
+
+        <span class="c1"># Ehi: High-frequency to low-frequency ratio</span>
+        <span class="n">mid</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">)</span>
+        <span class="n">low_energy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[:</span><span class="n">mid</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">high_energy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">spectrum</span><span class="p">[</span><span class="n">mid</span><span class="p">:]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">Ehl</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">high_energy</span> <span class="o">/</span> <span class="p">(</span><span class="n">low_energy</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span>
+
+        <span class="c1"># C1: Normalized autocorrelation coefficient</span>
+        <span class="n">s_prev</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#if count &gt; 0 else frame</span>
+        <span class="n">C1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">correlate</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">s_prev</span><span class="p">[:</span><span class="n">frame_length</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">frame</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-10</span><span class="p">)</span>
+        <span class="c1"># Nz: Zero-crossing rate </span>
+ 
+        <span class="n">zcr</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">frame</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">E</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">C1</span><span class="p">,</span> <span class="n">Ehl</span><span class="p">,</span> <span class="n">zcr</span><span class="p">])</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+
+    <span class="c1"># Classify voiced/unvoiced/silence using GMM</span>
+    <span class="n">gmm1</span> <span class="o">=</span> <span class="n">GaussianMixture</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">covariance_type</span><span class="o">=</span><span class="s1">&#39;diag&#39;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">gmm1</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>  
+    <span class="n">means</span> <span class="o">=</span> <span class="n">gmm1</span><span class="o">.</span><span class="n">means_</span>
+    <span class="n">voiced_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">means</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>  <span class="c1"># Higher energy =&gt; Voiced</span>
+    <span class="n">voiced_mask</span> <span class="o">=</span> <span class="n">gmm1</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features</span><span class="p">)</span> <span class="o">==</span> <span class="n">voiced_idx</span>
+
+    <span class="c1"># Unvoiced vs Silence</span>
+    <span class="n">features_us</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="o">~</span><span class="n">voiced_mask</span><span class="p">]</span>
+    <span class="n">gmm2</span> <span class="o">=</span> <span class="n">GaussianMixture</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">covariance_type</span><span class="o">=</span><span class="s1">&#39;diag&#39;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">gmm2</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">features_us</span><span class="p">)</span>
+    <span class="n">means2</span> <span class="o">=</span> <span class="n">gmm2</span><span class="o">.</span><span class="n">means_</span>
+    <span class="n">unvoiced_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">means2</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+    <span class="n">unvoiced_mask</span> <span class="o">=</span> <span class="n">gmm2</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">features_us</span><span class="p">)</span> <span class="o">==</span> <span class="n">unvoiced_idx</span>
+    
+    <span class="c1"># Raw labels: 0 = silence, 1 = unvoiced, 2 = voiced</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">labels</span><span class="p">[</span><span class="n">voiced_mask</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># Voiced</span>
+    <span class="n">labels</span><span class="p">[</span><span class="o">~</span><span class="n">voiced_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">unvoiced_mask</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Unvoiced</span>
+    
+    <span class="c1">#Step 1: Smoothing the labels</span>
+    <span class="n">half_win</span> <span class="o">=</span> <span class="n">smoothing_window</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">padded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="p">(</span><span class="n">half_win</span><span class="p">,</span> <span class="n">half_win</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;edge&#39;</span><span class="p">)</span>
+    
+    <span class="n">smoothed_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="nb">int</span><span class="p">(</span><span class="n">mode</span><span class="p">(</span><span class="n">padded</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">smoothing_window</span><span class="p">],</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">))</span>
+    <span class="p">])</span>
+
+    <span class="c1"># Step 2: Post-processing cleanup</span>
+    <span class="n">frame_duration</span> <span class="o">=</span> <span class="p">(</span><span class="n">frame_length</span><span class="o">-</span><span class="n">winover</span><span class="p">)</span> <span class="o">/</span> <span class="n">sr</span>  <span class="c1"># seconds</span>
+    <span class="n">min_duration_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.01</span> <span class="o">/</span> <span class="n">frame_duration</span><span class="p">)</span>  <span class="c1">#  10ms</span>
+    <span class="n">long_wait_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.05</span> <span class="o">/</span> <span class="n">frame_duration</span><span class="p">)</span>  <span class="c1"># 90ms</span>
+    
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">smoothed_labels</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">relabel_short_segments</span><span class="p">(</span><span class="n">target_class</span><span class="p">,</span> <span class="n">surrounding_class</span><span class="p">):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">target_class</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">continue</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+            <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="ow">and</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">target_class</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="k">if</span> <span class="n">length</span> <span class="o">&lt;</span> <span class="n">min_duration_frames</span><span class="p">:</span>
+                <span class="n">before</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">start</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="n">after</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+                <span class="k">if</span> <span class="n">before</span> <span class="o">==</span> <span class="n">after</span> <span class="o">==</span> <span class="n">surrounding_class</span><span class="p">:</span>
+                    <span class="n">labels</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">surrounding_class</span>
+
+    <span class="c1"># Rule A: Short voiced segments between unvoiced → unvoiced</span>
+    <span class="n">relabel_short_segments</span><span class="p">(</span><span class="n">target_class</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">surrounding_class</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Rule B: Short unvoiced segments between voiced → voiced</span>
+    <span class="n">relabel_short_segments</span><span class="p">(</span><span class="n">target_class</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">surrounding_class</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Rule C: First unvoiced segment not followed by voiced in 90ms → silence</span>
+    <span class="c1"># Find first UV segment</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">lookahead</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">long_wait_frames</span><span class="p">]</span>
+            <span class="k">if</span> <span class="mi">2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lookahead</span><span class="p">:</span>
+                <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">lookahead</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Silence</span>
+            <span class="k">break</span>
+    
+    <span class="k">return</span> <span class="n">labels</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Richard Ladislav.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

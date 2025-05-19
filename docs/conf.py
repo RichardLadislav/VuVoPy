@@ -8,11 +8,11 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../..'))  # Adjust the path to your source code
+sys.path.insert(0, os.path.abspath('../../src'))
 project = 'VuVoPy'
 copyright = '2025, Richard Ladislav'
 author = 'Richard Ladislav'
-release = '0.1.1'
+release = '0.0.2a'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

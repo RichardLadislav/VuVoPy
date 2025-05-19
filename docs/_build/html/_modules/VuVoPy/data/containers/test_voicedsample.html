@@ -1,0 +1,213 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VuVoPy.data.containers.test_voicedsample &mdash; VuVoPy 0.0.2a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=21daeed8"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            VuVoPy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">VuVoPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">VuVoPy.data.containers.test_voicedsample</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for VuVoPy.data.containers.test_voicedsample</h1><div class="highlight"><pre>
+<span></span><span class="c1"># tests/test_voicedsample.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">VoiceSample</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.prepocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preprocessed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.segmentation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Segmented</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.utils.vuvs_detection</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vuvs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.voiced_sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">VoicedSample</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+<div class="viewcode-block" id="DummyVuvs">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.test_voicedsample.DummyVuvs">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DummyVuvs</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple stub that returns a fixed sequence of V/UV labels.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="o">=</span> <span class="n">labels</span>
+
+<div class="viewcode-block" id="DummyVuvs.get_vuvs">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.test_voicedsample.DummyVuvs.get_vuvs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_vuvs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span></div>
+</div>
+
+
+<div class="viewcode-block" id="make_pipeline">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.test_voicedsample.make_pipeline">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_pipeline</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Builds a VoicedSample from raw x, fs and a sequence of vuv labels.&quot;&quot;&quot;</span>
+    <span class="n">vs</span> <span class="o">=</span> <span class="n">VoiceSample</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span>
+    <span class="n">pp</span> <span class="o">=</span> <span class="n">Preprocessed</span><span class="o">.</span><span class="n">from_voice_sample</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
+    <span class="n">sg</span> <span class="o">=</span> <span class="n">Segmented</span><span class="o">.</span><span class="n">from_voice_sample</span><span class="p">(</span><span class="n">pp</span><span class="p">,</span> <span class="n">winlen</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;square&#39;</span><span class="p">,</span> <span class="n">winover</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">vuvs</span> <span class="o">=</span> <span class="n">DummyVuvs</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">VoicedSample</span><span class="p">(</span><span class="n">pp</span><span class="p">,</span> <span class="n">vuvs</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_label_stretch_preserves_length_and_proportions">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.test_voicedsample.test_label_stretch_preserves_length_and_proportions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_label_stretch_preserves_length_and_proportions</span><span class="p">():</span>
+    <span class="c1"># original labels length = 5, x length = 10</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">vs</span> <span class="o">=</span> <span class="n">VoiceSample</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span>
+    <span class="n">pp</span> <span class="o">=</span> <span class="n">Preprocessed</span><span class="o">.</span><span class="n">from_voice_sample</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
+    <span class="n">vsamp</span> <span class="o">=</span> <span class="n">VoicedSample</span><span class="p">(</span><span class="n">pp</span><span class="p">,</span> <span class="n">DummyVuvs</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">fs</span><span class="p">)</span>
+
+    <span class="n">stretched</span> <span class="o">=</span> <span class="n">vsamp</span><span class="o">.</span><span class="n">label_stretch</span><span class="p">()</span>
+    <span class="c1"># must match target length</span>
+    <span class="k">assert</span> <span class="n">stretched</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># counts proportional: original segment lens [2,2,1] → proportions [2/5,2/5,1/5]</span>
+    <span class="c1"># expect counts [4,4,2]</span>
+    <span class="n">unique</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">stretched</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">count_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">unique</span><span class="p">,</span> <span class="n">counts</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="n">count_map</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">count_map</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+    <span class="k">assert</span> <span class="n">count_map</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span></div>
+
+
+<div class="viewcode-block" id="test_get_voiced_sample_picks_label_2">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.test_voicedsample.test_get_voiced_sample_picks_label_2">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_get_voiced_sample_picks_label_2</span><span class="p">():</span>
+    <span class="c1"># use the same labels as above</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">vsamp</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">voiced</span> <span class="o">=</span> <span class="n">vsamp</span><span class="o">.</span><span class="n">get_waveform</span><span class="p">()</span>  <span class="c1"># alias for voiced_sample</span>
+    <span class="c1"># since label_stretch yields 4 of label 2, we expect first 4 samples of x</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">voiced</span><span class="p">,</span> <span class="n">x</span><span class="p">[:</span><span class="mi">4</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="test_get_silence_remove_sample_removes_long_silence">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.test_voicedsample.test_get_silence_remove_sample_removes_long_silence">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_get_silence_remove_sample_removes_long_silence</span><span class="p">():</span>
+    <span class="c1"># Here fs small so min_frames = ceil(50/1000 * 2) = 1, so any zero runs removed</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">50</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">vsamp</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">sr</span> <span class="o">=</span> <span class="n">vsamp</span><span class="o">.</span><span class="n">get_silence_remove_sample</span><span class="p">()</span>
+    <span class="c1"># segments where label==0 get removed entirely, so only the two 2s remain</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="test_get_silence_remove_sample_keeps_short_silence">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.test_voicedsample.test_get_silence_remove_sample_keeps_short_silence">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_get_silence_remove_sample_keeps_short_silence</span><span class="p">():</span>
+    <span class="c1"># Here fs large so min_frames = ceil(50/1000*1000) = 50, zero runs of length &lt;50 kept</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">vsamp</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">sr</span> <span class="o">=</span> <span class="n">vsamp</span><span class="o">.</span><span class="n">get_silence_remove_sample</span><span class="p">()</span>
+    <span class="c1"># since no zero-run is ≥50 frames, nothing is removed → same as voiced_sample</span>
+    <span class="c1"># voiced_sample for this label run = 2s only → x positions 2 and 3</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">vsamp</span><span class="o">.</span><span class="n">get_voiced_sample</span><span class="p">(),</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
+    <span class="c1"># but silence_remove should leave all x unchanged because zero-runs too short</span>
+    <span class="c1"># the code currently removes only runs &gt;= min_frames, so here min_frames=50, no removal</span>
+    <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">sr</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="test_get_sampling_rate">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.test_voicedsample.test_get_sampling_rate">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_get_sampling_rate</span><span class="p">():</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="mi">12345</span>
+    <span class="n">vsamp</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">))</span>
+    <span class="k">assert</span> <span class="n">vsamp</span><span class="o">.</span><span class="n">get_sampling_rate</span><span class="p">()</span> <span class="o">==</span> <span class="n">fs</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Richard Ladislav.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,297 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VuVoPy.data.utils.vuvs_detection &mdash; VuVoPy 0.0.2a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=21daeed8"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            VuVoPy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">VuVoPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">VuVoPy.data.utils.vuvs_detection</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for VuVoPy.data.utils.vuvs_detection</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.prepocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preprocessed</span> <span class="k">as</span> <span class="n">pp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">VoiceSample</span> <span class="k">as</span> <span class="n">vs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.segmentation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Segmented</span> <span class="k">as</span> <span class="n">sg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.utils.vuvs_gmm</span><span class="w"> </span><span class="kn">import</span> <span class="n">vuvs_gmm</span>
+ 
+<div class="viewcode-block" id="Vuvs">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.vuvs_detection.Vuvs">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Vuvs</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Vuvs class is designed to analyze voiced, unvoiced, and silence segments in an audio signal. </span>
+<span class="sd">    It uses Gaussian Mixture Models (GMM) to compute these segments and provides methods to retrieve </span>
+<span class="sd">    various statistics about silence durations and counts.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        segment (array-like): The original audio segment.</span>
+<span class="sd">        segment_preem (array-like): The pre-emphasized audio segment.</span>
+<span class="sd">        segment_norm (array-like): The normalized audio segment.</span>
+<span class="sd">        fs (int): The sampling rate of the audio signal.</span>
+<span class="sd">        winlen (int): The length of the analysis window in samples. Default is 512.</span>
+<span class="sd">        winover (int): The overlap between consecutive windows in samples. Default is 496.</span>
+<span class="sd">        wintype (str): The type of window to apply (e.g., &#39;hann&#39;). Default is &#39;hann&#39;.</span>
+<span class="sd">        smoothing_window (int): The size of the smoothing window for post-processing. Default is 5.</span>
+<span class="sd">        vuvs (array-like): The computed voiced/unvoiced/silence segments.</span>
+<span class="sd">    Methods:</span>
+<span class="sd">        calculate_vuvs():</span>
+<span class="sd">            Compute the voiced/unvoiced/silence segments using a GMM-based approach.</span>
+<span class="sd">        get_vuvs():</span>
+<span class="sd">            Retrieve the computed voiced/unvoiced/silence segments.</span>
+<span class="sd">        get_sampling_rate():</span>
+<span class="sd">            Retrieve the sampling rate of the audio signal.</span>
+<span class="sd">        get_total_silence_duration(min_silence_duration_ms=50):</span>
+<span class="sd">            Calculate the total duration (in seconds) of silences longer than a specified threshold.</span>
+<span class="sd">        get_silence_count(min_silence_duration_ms=50):</span>
+<span class="sd">            Count the number of silent segments longer than a specified threshold.</span>
+<span class="sd">        get_silence_durations(min_silence_duration_ms=50):</span>
+<span class="sd">            Retrieve a list of durations (in seconds) for all silences longer than a specified threshold.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">winlen</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span> <span class="n">winover</span> <span class="o">=</span> <span class="mi">496</span><span class="p">,</span> <span class="n">wintype</span> <span class="o">=</span> <span class="s1">&#39;hann&#39;</span><span class="p">,</span> <span class="n">smoothing_window</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segment</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">get_segment</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segment_preem</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">get_preem_segment</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segment_norm</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">get_norm_segment</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">fs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">winlen</span> <span class="o">=</span> <span class="n">winlen</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">winover</span> <span class="o">=</span> <span class="n">winover</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wintype</span> <span class="o">=</span> <span class="n">wintype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smoothing_window</span> <span class="o">=</span> <span class="n">smoothing_window</span>
+
+        <span class="c1"># Compute vuvs vuvs upon initialization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vuvs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_vuvs</span><span class="p">()</span>
+        
+<div class="viewcode-block" id="Vuvs.calculate_vuvs">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.vuvs_detection.Vuvs.calculate_vuvs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_vuvs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the voiced/unvoiced segments (VUVS) of an audio signal.</span>
+<span class="sd">        This method uses a Gaussian Mixture Model (GMM) to determine the voiced </span>
+<span class="sd">        and unvoiced segments of the audio signal based on the provided parameters.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of VUVs detected in the audio signal.</span>
+<span class="sd">        Notes:</span>
+<span class="sd">            - The method relies on the `vuvs_gmm` function, which performs the </span>
+<span class="sd">              actual VUV detection.</span>
+<span class="sd">            - The detection process uses the attributes `segment`, `fs`, </span>
+<span class="sd">              `winover`, and `smoothing_window` of the class instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">return</span> <span class="n">vuvs_gmm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">segment</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">winover</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smoothing_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Vuvs.get_vuvs">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.vuvs_detection.Vuvs.get_vuvs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_vuvs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return computed voiced/unvoiced/scilence segments.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vuvs</span></div>
+
+
+<div class="viewcode-block" id="Vuvs.get_sampling_rate">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.vuvs_detection.Vuvs.get_sampling_rate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sampling_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sampling rate.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span></div>
+
+    
+<div class="viewcode-block" id="Vuvs.get_total_silence_duration">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.vuvs_detection.Vuvs.get_total_silence_duration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_total_silence_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_silence_duration_ms</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return total duration (in seconds) of silences longer than the threshold.&quot;&quot;&quot;</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vuvs</span>
+        <span class="n">hop_duration</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">winlen</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">winover</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span>
+        <span class="n">min_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">min_silence_duration_ms</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">/</span> <span class="n">hop_duration</span><span class="p">))</span>
+
+        <span class="n">total_duration</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="ow">and</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">silence_len</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">start</span>
+                <span class="k">if</span> <span class="n">silence_len</span> <span class="o">&gt;=</span> <span class="n">min_frames</span><span class="p">:</span>
+                    <span class="n">total_duration</span> <span class="o">+=</span> <span class="n">silence_len</span> <span class="o">*</span> <span class="n">hop_duration</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">total_duration</span></div>
+
+
+<div class="viewcode-block" id="Vuvs.get_silence_count">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.vuvs_detection.Vuvs.get_silence_count">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_silence_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_silence_duration_ms</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return number of silent segments longer than the threshold.&quot;&quot;&quot;</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vuvs</span>
+        <span class="n">hop_duration</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">winlen</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">winover</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span>
+        <span class="n">min_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">min_silence_duration_ms</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">/</span> <span class="n">hop_duration</span><span class="p">))</span>
+
+        <span class="n">silence_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="ow">and</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">silence_len</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">start</span>
+                <span class="k">if</span> <span class="n">silence_len</span> <span class="o">&gt;=</span> <span class="n">min_frames</span><span class="p">:</span>
+                    <span class="n">silence_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">silence_count</span></div>
+
+
+<div class="viewcode-block" id="Vuvs.get_silence_durations">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.vuvs_detection.Vuvs.get_silence_durations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_silence_durations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_silence_duration_ms</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return list of durations (in seconds) for all silences longer than the threshold.&quot;&quot;&quot;</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vuvs</span>
+        <span class="n">hop_duration</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">winlen</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">winover</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span>
+        <span class="n">min_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">min_silence_duration_ms</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">/</span> <span class="n">hop_duration</span><span class="p">))</span>
+
+        <span class="n">durations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="ow">and</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">silence_len</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">start</span>
+                <span class="k">if</span> <span class="n">silence_len</span> <span class="o">&gt;=</span> <span class="n">min_frames</span><span class="p">:</span>
+                    <span class="n">durations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">silence_len</span> <span class="o">*</span> <span class="n">hop_duration</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">durations</span></div>
+</div>
+
+
+    
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.vuvs_detection.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main function to demonstrate the usage of Vuvs class.&quot;&quot;&quot;</span>
+    <span class="n">folder_path</span> <span class="o">=</span> <span class="s2">&quot;C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav&quot;</span>
+    <span class="n">vsample</span> <span class="o">=</span> <span class="n">vs</span><span class="o">.</span><span class="n">from_wav</span><span class="p">(</span><span class="n">folder_path</span><span class="p">)</span>
+    <span class="n">preprocessed_sample</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">from_voice_sample</span><span class="p">(</span><span class="n">vsample</span><span class="p">)</span>
+    <span class="n">segment</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">from_voice_sample</span><span class="p">(</span><span class="n">preprocessed_sample</span><span class="p">,</span> <span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;hamm&#39;</span><span class="p">,</span> <span class="n">winover</span><span class="o">=</span><span class="mi">496</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.94</span><span class="p">)</span>
+    <span class="n">vuvs</span> <span class="o">=</span> <span class="n">Vuvs</span><span class="p">(</span><span class="n">segment</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">vsample</span><span class="o">.</span><span class="n">get_sampling_rate</span><span class="p">(),</span> <span class="n">winlen</span> <span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">get_window_length</span><span class="p">(),</span> <span class="n">winover</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">get_window_overlap</span><span class="p">(),</span> <span class="n">wintype</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">get_window_type</span><span class="p">(),</span> <span class="n">smoothing_window</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">vuvs</span><span class="o">.</span><span class="n">get_vuvs</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">vsample</span><span class="o">.</span><span class="n">get_waveform</span><span class="p">()</span>
+    <span class="n">sr</span> <span class="o">=</span> <span class="n">vsample</span><span class="o">.</span><span class="n">get_sampling_rate</span><span class="p">()</span>
+    <span class="n">hop_length</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">get_window_length</span><span class="p">()</span> <span class="o">-</span> <span class="n">segment</span><span class="o">.</span><span class="n">get_window_overlap</span><span class="p">()</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">sr</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+
+
+    <span class="n">class_line</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">l</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">l</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">])</span>
+
+    <span class="c1"># Stretch classification line to match waveform length</span>
+    <span class="n">class_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">class_line</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">hop_length</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">hop_length</span>
+        <span class="n">class_signal</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="c1"># plotting the results</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">y</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Normalized Waveform&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">class_signal</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;V/UV/S Classification&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Speech Waveform with Voiced / Unvoiced / Silence Classification&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time [s]&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;Silence&quot;</span><span class="p">,</span> <span class="s2">&quot;Unvoiced&quot;</span><span class="p">,</span> <span class="s2">&quot;Voiced&quot;</span><span class="p">])</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">&quot;upper right&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span> <span class="kc">True</span><span class="p">)</span></div>
+
+        
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Richard Ladislav.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,8 +1,8 @@
 import numpy as np
-from VuVoPy.data.containers.prepocessing import Preprocessed as pp
-from VuVoPy.data.containers.sample import VoiceSample as vs
-from VuVoPy.data.containers.segmentation import Segmented as sg
-from VuVoPy.data.utils.vuvs_detection import Vuvs as vuvs
+from ...data.containers.prepocessing import Preprocessed as pp
+from ...data.containers.sample import VoiceSample as vs
+from ...data.containers.segmentation import Segmented as sg
+from ...data.utils.vuvs_detection import Vuvs as vuvs
 
 def durmad(folder_path, winlen=512, winover=496, wintype='hamm'):
     """

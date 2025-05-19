@@ -1,0 +1,295 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VuVoPy.data.containers.voiced_sample &mdash; VuVoPy 0.0.2a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=21daeed8"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            VuVoPy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">VuVoPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">VuVoPy.data.containers.voiced_sample</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for VuVoPy.data.containers.voiced_sample</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.prepocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preprocessed</span> <span class="k">as</span> <span class="n">pp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">VoiceSample</span> <span class="k">as</span> <span class="n">vs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.segmentation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Segmented</span> <span class="k">as</span> <span class="n">sg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.utils.vuvs_detection</span><span class="w"> </span><span class="kn">import</span> <span class="n">Vuvs</span> <span class="k">as</span> <span class="n">vuvs</span>
+
+<div class="viewcode-block" id="VoicedSample">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.voiced_sample.VoicedSample">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VoicedSample</span><span class="p">(</span><span class="n">vs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    VoicedSample is a class that processes and analyzes preprocessed audio data to extract voiced samples </span>
+<span class="sd">    and remove silence from the waveform. It also provides functionality to stretch labels to match the </span>
+<span class="sd">    signal length.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        x (numpy.ndarray): The original waveform extracted from the preprocessed data.</span>
+<span class="sd">        x_preem (numpy.ndarray): The pre-emphasized version of the waveform.</span>
+<span class="sd">        x_norm (numpy.ndarray): The normalized version of the waveform.</span>
+<span class="sd">        fs (int): The sampling rate of the audio signal.</span>
+<span class="sd">        vuvs (object): An object containing voiced/unvoiced labels for the audio signal.</span>
+<span class="sd">        voiced_sample (numpy.ndarray): The waveform containing only voiced segments.</span>
+<span class="sd">        silence_removed_sample (numpy.ndarray): The waveform with silence removed.</span>
+<span class="sd">    Methods:</span>
+<span class="sd">        get_waveform():</span>
+<span class="sd">            Returns the silence-removed waveform as a NumPy array.</span>
+<span class="sd">        label_stretch():</span>
+<span class="sd">            Stretches the voiced/unvoiced labels to match the length of the audio signal.</span>
+<span class="sd">        get_voiced_sample():</span>
+<span class="sd">            Extracts and returns the voiced segments of the waveform based on the stretched labels.</span>
+<span class="sd">        get_silence_remove_sample():</span>
+<span class="sd">            Removes silence from the waveform based on the stretched labels and returns the resulting waveform.</span>
+<span class="sd">        get_sampling_rate():</span>
+<span class="sd">            Returns the sampling rate of the audio signal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preprocessed</span><span class="p">,</span> <span class="n">vuvs</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span> <span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">preprocessed</span><span class="o">.</span><span class="n">get_waveform</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_preem</span> <span class="o">=</span> <span class="n">preprocessed</span><span class="o">.</span><span class="n">get_preemphasis</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_norm</span> <span class="o">=</span> <span class="n">preprocessed</span><span class="o">.</span><span class="n">get_normalization</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fs</span> <span class="o">=</span> <span class="n">preprocessed</span><span class="o">.</span><span class="n">get_sampling_rate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vuvs</span> <span class="o">=</span> <span class="n">vuvs</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">voiced_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_voiced_sample</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">silence_removed_sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_silence_remove_sample</span><span class="p">()</span>
+
+<div class="viewcode-block" id="VoicedSample.get_waveform">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.voiced_sample.VoicedSample.get_waveform">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_waveform</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the silence removed waveform as a NumPy array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">voiced_sample</span></div>
+
+
+<div class="viewcode-block" id="VoicedSample.label_stretch">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.voiced_sample.VoicedSample.label_stretch">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">label_stretch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stretches or compresses a sequence of labels to match the length of a target array.</span>
+<span class="sd">        This function takes a sequence of labels and adjusts their lengths proportionally </span>
+<span class="sd">        to match the length of the target array `self.x`. It ensures that the relative </span>
+<span class="sd">        proportions of the original label segments are preserved while fixing any rounding </span>
+<span class="sd">        errors to exactly match the target length.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            np.ndarray: A stretched or compressed array of labels with the same length as `self.x`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vuvs</span><span class="o">.</span><span class="n">get_vuvs</span><span class="p">()</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+        <span class="n">target_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Find segments where values stay the same</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">start_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)):</span>
+           <span class="k">if</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">arr</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+              <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:</span><span class="n">i</span><span class="p">])</span>
+              <span class="n">start_idx</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">start_idx</span><span class="p">:])</span>  <span class="c1"># Add last segment</span>
+        <span class="n">original_lens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span> <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">])</span>
+
+        <span class="c1"># Determine how many samples per segment</span>
+        <span class="n">total_original</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">original_lens</span><span class="p">)</span>
+    
+        <span class="c1"># Calculate how much to stretch each segment</span>
+        <span class="n">stretched_lens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">((</span><span class="n">original_lens</span> <span class="o">/</span> <span class="n">total_original</span><span class="p">)</span> <span class="o">*</span> <span class="n">target_len</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="c1"># Fix rounding errors to exactly match target_len</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">target_len</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">stretched_lens</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">diff</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">stretched_lens</span><span class="p">)):</span>
+               <span class="k">if</span> <span class="n">diff</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                  <span class="k">break</span>
+            <span class="n">stretched_lens</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">target_len</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">stretched_lens</span><span class="p">)</span>
+
+        <span class="c1"># Build the stretched array</span>
+        <span class="n">stretched</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">seg</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">seg</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">segments</span><span class="p">,</span> <span class="n">stretched_lens</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">stretched</span></div>
+
+    
+<div class="viewcode-block" id="VoicedSample.get_voiced_sample">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.voiced_sample.VoicedSample.get_voiced_sample">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_voiced_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extracts and returns the voiced portion of the audio sample.</span>
+<span class="sd">        This method uses the label information to identify the voiced segments</span>
+<span class="sd">        in the audio sample. It assumes that the labels are generated such that</span>
+<span class="sd">        a label value of 2 corresponds to voiced segments.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: A subset of the audio sample containing only the </span>
+<span class="sd">            voiced segments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_stretch</span><span class="p">()</span>
+        <span class="n">voiced_sample</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">labels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">voiced_sample</span></div>
+
+
+<div class="viewcode-block" id="VoicedSample.get_silence_remove_sample">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.voiced_sample.VoicedSample.get_silence_remove_sample">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_silence_remove_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes segments of silence from the audio sample based on the provided labels.</span>
+<span class="sd">        This method identifies silent regions in the audio sample `self.x` using the </span>
+<span class="sd">        labels generated by the `label_stretch` method. Silent regions are defined as </span>
+<span class="sd">        consecutive frames labeled as 0, with a duration greater than or equal to 50 ms. </span>
+<span class="sd">        These regions are then removed from the audio sample.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            numpy.ndarray: A modified version of the audio sample `self.x` with silent </span>
+<span class="sd">            regions removed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">sample</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_stretch</span><span class="p">()</span>
+        
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">min_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">50</span> <span class="o">/</span> <span class="mi">1000</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span><span class="p">))</span>
+        <span class="n">silence_idx</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span> <span class="ow">and</span> <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">silence_len</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="n">start</span>
+                <span class="k">if</span> <span class="n">silence_len</span> <span class="o">&gt;=</span> <span class="n">min_frames</span><span class="p">:</span>
+                    <span class="n">silence_idx</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">start</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">silence_idx</span><span class="p">:</span>
+                <span class="n">mask</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="VoicedSample.get_sampling_rate">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.voiced_sample.VoicedSample.get_sampling_rate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sampling_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the sampling rate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span></div>
+</div>
+
+    
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.containers.html#VuVoPy.data.containers.voiced_sample.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">folder_path</span> <span class="o">=</span> <span class="s2">&quot;C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav&quot;</span>
+    <span class="n">preprocessed_sample</span> <span class="o">=</span> <span class="n">pp</span><span class="o">.</span><span class="n">from_voice_sample</span><span class="p">(</span><span class="n">vs</span><span class="o">.</span><span class="n">from_wav</span><span class="p">(</span><span class="n">folder_path</span><span class="p">))</span>
+    <span class="n">segment</span> <span class="o">=</span> <span class="n">sg</span><span class="o">.</span><span class="n">from_voice_sample</span><span class="p">(</span><span class="n">preprocessed_sample</span><span class="p">,</span> <span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">winover</span><span class="o">=</span><span class="mi">496</span><span class="p">,</span> <span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;hamm&#39;</span><span class="p">)</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">get_sampling_rate</span><span class="p">()</span>
+    
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">vuvs</span><span class="p">(</span><span class="n">segment</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span> <span class="n">winlen</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">get_window_length</span><span class="p">(),</span> <span class="n">winover</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">get_window_overlap</span><span class="p">(),</span> <span class="n">wintype</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">get_window_type</span><span class="p">(),</span> <span class="n">smoothing_window</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">voiced_sample</span> <span class="o">=</span> <span class="n">VoicedSample</span><span class="p">(</span><span class="n">preprocessed_sample</span><span class="p">,</span><span class="n">labels</span><span class="p">,</span><span class="n">fs</span><span class="p">)</span><span class="o">.</span><span class="n">get_voiced_sample</span><span class="p">()</span>
+    <span class="n">silence_removed_sample</span> <span class="o">=</span> <span class="n">VoicedSample</span><span class="p">(</span><span class="n">preprocessed_sample</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span><span class="o">.</span><span class="n">get_silence_remove_sample</span><span class="p">()</span>
+    <span class="n">voiced_sample</span> <span class="o">=</span> <span class="n">VoicedSample</span><span class="p">(</span><span class="n">preprocessed_sample</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span><span class="o">.</span><span class="n">get_voiced_sample</span><span class="p">()</span>
+    <span class="n">stretched_labels</span> <span class="o">=</span> <span class="n">VoicedSample</span><span class="p">(</span><span class="n">preprocessed_sample</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span><span class="o">.</span><span class="n">label_stretch</span><span class="p">()</span>
+    <span class="c1">#    Plotting the results</span>
+    <span class="c1">#plt.figure(figsize=(12, 6))</span>
+    <span class="c1">#plt.plot(stretched_labels, label=&#39;stretched labels&#39;)</span>
+    <span class="c1">#plt.plot(labels.get_vuvs(), label=&#39;origianl labels&#39;)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">preprocessed_sample</span><span class="o">.</span><span class="n">get_waveform</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Original signal&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">voiced_sample</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Voiced sigal&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">silence_removed_sample</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Silence removed signal&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;done done doneeee&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Richard Ladislav.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

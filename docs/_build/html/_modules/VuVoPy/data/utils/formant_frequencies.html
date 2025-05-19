@@ -1,0 +1,281 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VuVoPy.data.utils.formant_frequencies &mdash; VuVoPy 0.0.2a documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=21daeed8"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            VuVoPy
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">VuVoPy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">VuVoPy.data.utils.formant_frequencies</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for VuVoPy.data.utils.formant_frequencies</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">librosa</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">lb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.prepocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Preprocessed</span>     
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">VoiceSample</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">VuVoPy.data.containers.segmentation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Segmented</span>
+
+
+<div class="viewcode-block" id="FormantFrequencies">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.formant_frequencies.FormantFrequencies">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FormantFrequencies</span><span class="p">(</span><span class="n">Segmented</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    FormantFrequencies is a class for extracting and managing formant frequencies from segmented voice data.</span>
+<span class="sd">    Formants are resonant frequencies of the vocal tract, and this class provides methods to calculate and retrieve</span>
+<span class="sd">    formant frequencies from raw, pre-emphasized, and normalized voice segments.</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        formants (numpy.ndarray): A 3D array containing formant frequencies for raw, pre-emphasized, and normalized</span>
+<span class="sd">                                  voice segments. The shape is (N, 3, 3), where N is the number of segments, and the</span>
+<span class="sd">                                  second and third dimensions correspond to the first three formants (F1, F2, F3) and</span>
+<span class="sd">                                  the type of segment (raw, pre-emphasized, normalized), respectively.</span>
+<span class="sd">    Methods:</span>
+<span class="sd">        __init__(fs, formants):</span>
+<span class="sd">            Initializes the FormantFrequencies object with a sampling rate and formant frequencies.</span>
+<span class="sd">        from_voice_sample(segments):</span>
+<span class="sd">            Class method to create an instance of FormantFrequencies by extracting formant frequencies from</span>
+<span class="sd">            segmented voice data.</span>
+<span class="sd">        get_formants():</span>
+<span class="sd">            Returns the numpy array of formants extracted from the raw waveform.</span>
+<span class="sd">        get_formants_preem():</span>
+<span class="sd">            Returns the numpy array of formants extracted from the pre-emphasized waveform.</span>
+<span class="sd">        get_formants_norm():</span>
+<span class="sd">            Returns the numpy array of formants extracted from the normalized waveform.</span>
+<span class="sd">        get_sampling_rate():</span>
+<span class="sd">            Returns the sampling rate of the voice data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="FormantFrequencies.__init__">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.formant_frequencies.FormantFrequencies.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">formants</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formants</span> <span class="o">=</span> <span class="n">formants</span></div>
+
+<div class="viewcode-block" id="FormantFrequencies.from_voice_sample">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.formant_frequencies.FormantFrequencies.from_voice_sample">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_voice_sample</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">segments</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an instance of the class from a voice sample by extracting formant frequencies.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            cls: The class itself, used to create an instance.</span>
+<span class="sd">            segments: An object containing segmented voice data with methods to retrieve</span>
+<span class="sd">                      raw, pre-emphasized, and normalized segments, as well as the sampling rate.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            An instance of the class initialized with the sampling rate and extracted formant frequencies.</span>
+<span class="sd">        Notes:</span>
+<span class="sd">            - The method calculates LPC coefficients for raw, pre-emphasized, and normalized segments.</span>
+<span class="sd">            - Formant frequencies are derived from the roots of the LPC polynomial.</span>
+<span class="sd">            - Only roots with non-negative imaginary parts are considered.</span>
+<span class="sd">            - The method currently extracts and sorts the first three formants for each segment.</span>
+<span class="sd">            - The bandwidths of the formants are not calculated at this stage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">seg_x</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">get_segment</span><span class="p">()</span> 
+        <span class="n">seg_x_preem</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">get_preem_segment</span><span class="p">()</span>
+        <span class="n">seg_x_norm</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">get_norm_segment</span><span class="p">()</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">get_sampling_rate</span><span class="p">()</span> 
+        
+        <span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="n">fs</span><span class="o">/</span><span class="mi">1000</span> <span class="o">+</span><span class="mi">2</span><span class="p">))</span>
+
+        <span class="n">lpc_coeff_x</span> <span class="o">=</span> <span class="n">lb</span><span class="o">.</span><span class="n">lpc</span><span class="p">(</span><span class="n">seg_x</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="n">lpc_coeff_x_prem</span> <span class="o">=</span> <span class="n">lb</span><span class="o">.</span><span class="n">lpc</span><span class="p">(</span><span class="n">seg_x_preem</span> <span class="p">,</span><span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="n">lpc_coeff_x_norm</span> <span class="o">=</span> <span class="n">lb</span><span class="o">.</span><span class="n">lpc</span><span class="p">(</span><span class="n">seg_x_norm</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        
+        <span class="n">N</span> <span class="o">=</span> <span class="n">lpc_coeff_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">formants</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">rts_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">rts_x_preem</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">rts_x_norm</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="c1">#Findiung roots of nominator of transfer function</span>
+            <span class="n">rts_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roots</span><span class="p">(</span><span class="n">lpc_coeff_x</span><span class="p">[</span><span class="n">i</span><span class="p">,:])</span>
+            <span class="n">rts_x_preem</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roots</span><span class="p">(</span><span class="n">lpc_coeff_x_prem</span><span class="p">[</span><span class="n">i</span><span class="p">,:])</span>
+            <span class="n">rts_x_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">roots</span><span class="p">(</span><span class="n">lpc_coeff_x_norm</span><span class="p">[</span><span class="n">i</span><span class="p">,:])</span>
+            
+            <span class="c1">#Finding non-zero Im{Z} &gt;=0</span>
+            <span class="n">rts_x</span> <span class="o">=</span> <span class="n">rts_x</span><span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">rts_x</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span> <span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">rts_x_preem</span> <span class="o">=</span> <span class="n">rts_x_preem</span><span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">rts_x_preem</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span> <span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">rts_x_norm</span> <span class="o">=</span> <span class="n">rts_x_norm</span><span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">rts_x_norm</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span> <span class="p">)]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="c1">#Finding formants</span>
+            <span class="n">tempF_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">rts_x</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">rts_x</span><span class="p">))</span>
+            <span class="n">tempF_x_preem</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">rts_x_preem</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">rts_x_preem</span><span class="p">))</span>
+            <span class="n">tempF_x_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">imag</span><span class="p">(</span><span class="n">rts_x_norm</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">rts_x_norm</span><span class="p">))</span>
+
+            <span class="c1">#Sorting formants</span>
+            <span class="n">sort_F</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">tempF_x</span><span class="p">)</span>
+            <span class="n">sort_F_preem</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">tempF_x_preem</span><span class="p">)</span>
+            <span class="n">sort_F_norm</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">tempF_x_norm</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">sort_F</span> <span class="o">==</span> <span class="p">[]:</span>    
+                <span class="n">sort_F</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                <span class="n">sort_F_preem</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                <span class="n">sort_F_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+            <span class="n">formants</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sort_F</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fs</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>  <span class="c1"># F1   </span>
+            <span class="n">formants</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sort_F</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fs</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+            <span class="n">formants</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sort_F</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fs</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="c1"># F3</span>
+            
+            
+            <span class="n">formants</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sort_F_preem</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fs</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>  <span class="c1"># F1   </span>
+            <span class="n">formants</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sort_F_preem</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fs</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+            <span class="n">formants</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sort_F_preem</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fs</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="c1"># F3</span>
+            
+            <span class="n">formants</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sort_F_norm</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fs</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>  <span class="c1"># F1   </span>
+            <span class="n">formants</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sort_F_norm</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fs</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+            <span class="n">formants</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sort_F_norm</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">fs</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="c1"># F3</span>
+            <span class="n">formants</span> <span class="o">=</span> <span class="n">formants</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">formants</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="FormantFrequencies.get_formants">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.formant_frequencies.FormantFrequencies.get_formants">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_formants</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the numpy array of formants extracted from raw waveform&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">formants</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="FormantFrequencies.get_formants_preem">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.formant_frequencies.FormantFrequencies.get_formants_preem">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_formants_preem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the numpy array of formants extracted from pre-emphasis waveform&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">formants</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span></div>
+
+    
+    
+<div class="viewcode-block" id="FormantFrequencies.get_formants_norm">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.formant_frequencies.FormantFrequencies.get_formants_norm">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_formants_norm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the numpy array of formants extracted from normalized waveform&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">formants</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span></div>
+
+    
+<div class="viewcode-block" id="FormantFrequencies.get_sampling_rate">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.formant_frequencies.FormantFrequencies.get_sampling_rate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sampling_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sampling rate.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fs</span></div>
+</div>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../../source/VuVoPy.data.utils.html#VuVoPy.data.utils.formant_frequencies.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="c1">#folder_path = &quot;C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav&quot;</span>
+    <span class="n">folder_path</span> <span class="o">=</span> <span class="s2">&quot;C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//short_test_database//recordings//K1021//K1021_7.1-3-a_1.wav&quot;</span>
+    <span class="n">processed_sample</span> <span class="o">=</span> <span class="n">Preprocessed</span><span class="o">.</span><span class="n">from_voice_sample</span><span class="p">(</span><span class="n">VoiceSample</span><span class="o">.</span><span class="n">from_wav</span><span class="p">(</span><span class="n">folder_path</span><span class="p">))</span>
+
+    <span class="n">seg</span> <span class="o">=</span> <span class="n">Segmented</span><span class="o">.</span><span class="n">from_voice_sample</span><span class="p">(</span><span class="n">processed_sample</span><span class="p">,</span> <span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">winover</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">wintype</span><span class="o">=</span><span class="s2">&quot;hann&quot;</span><span class="p">)</span>
+    <span class="n">formants</span> <span class="o">=</span> <span class="n">FormantFrequencies</span><span class="o">.</span><span class="n">from_voice_sample</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
+    <span class="n">formants_x</span> <span class="o">=</span> <span class="n">formants</span><span class="o">.</span><span class="n">get_formants</span><span class="p">()</span>
+    <span class="n">formants_preem</span> <span class="o">=</span> <span class="n">formants</span><span class="o">.</span><span class="n">get_formants_preem</span><span class="p">()</span>
+    <span class="n">formants_xnormm</span> <span class="o">=</span> <span class="n">formants</span><span class="o">.</span><span class="n">get_formants_norm</span><span class="p">()</span>
+    <span class="c1"># Apply different windowing functions dynamically</span>
+    <span class="c1">#seg_wave = seg.get_segment(winlen=512, wintype=&quot;hann&quot;, winover=256)</span>
+    <span class="c1">#seg_preem = seg.get_preem_segment(winlen=512, wintype=&quot;blackman&quot;, winover=256)</span>
+    <span class="c1">#seg_norm = seg.get_norm_segment(winlen=512, wintype=&quot;square&quot;, winover=256)</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">formants_preem</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">formants</span><span class="o">.</span><span class="n">get_sampling_rate</span><span class="p">()</span> <span class="c1"># Time step for analysis (seconds)</span>
+    <span class="c1"># Time vector for each window</span>
+    <span class="n">time_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">formants_preem</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dt</span><span class="p">)[:</span><span class="n">formants_preem</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">formants_xnormm</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>  <span class="c1"># Iterate over formant frequency columns</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">time_vector</span><span class="p">,</span><span class="n">formants_x</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Formant </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Formant Frequencies Over Time&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Frequency (Hz)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">block</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;holap&quot;</span><span class="p">)</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span> 
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Richard Ladislav.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
