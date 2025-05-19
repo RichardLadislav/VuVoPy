@@ -20,7 +20,7 @@ dependencies = [
   "librosa",
   "matplotlib",
   "scikit-learn",
-  "sympy"
+  "sympy",
   "sphinx",         
   "sphinx_rtd_theme" 
 ]
