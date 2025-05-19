@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Richard Ladislav documentation &mdash; VuVoPy 0.0.2a documentation</title>
+  <title>VuVoPy Documentation &mdash; VuVoPy 0.0.2a documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
@@ -42,7 +42,11 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Richard Ladislav documentation</a></li>
+<li><a class="reference internal" href="#">VuVoPy Documentation</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+</ul>
+</li>
 </ul>
 </div>
         </div>
@@ -59,7 +63,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Richard Ladislav documentation</li>
+      <li class="breadcrumb-item active">VuVoPy Documentation</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -69,13 +73,76 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="richard-ladislav-documentation">
-<h1>Richard Ladislav documentation<a class="headerlink" href="#richard-ladislav-documentation" title="Link to this heading"></a></h1>
-<p>Add your content using <code class="docutils literal notranslate"><span class="pre">reStructuredText</span></code> syntax. See the
-<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html">reStructuredText</a>
-documentation for details.</p>
+  <section id="vuvopy-documentation">
+<h1>VuVoPy Documentation<a class="headerlink" href="#vuvopy-documentation" title="Link to this heading"></a></h1>
+<p><strong>VuVoPy</strong> is a Python library for extracting acoustic features from speech signals,
+specifically developed for biomedical voice analysis and Parkinson’s disease research.</p>
+<p>This documentation includes:</p>
+<ul class="simple">
+<li><p>📦 Module overviews</p></li>
+<li><p>📊 Feature extraction functions</p></li>
+<li><p>🧠 Usage examples</p></li>
+<li><p>🛠 Developer reference</p></li>
+</ul>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h2>
+<p>To install VuVoPy in development mode:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>VuVoPy
+</pre></div>
+</div>
+<p>To use it in Python:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">VuVoPy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">vp</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">durmad</span><span class="p">(</span><span class="n">my_signal</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="toctree-wrapper compound">
 </div>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
+<p>Below you can find the automatically generated API reference for each module and submodule
+in the package. Click through to view detailed docstrings, parameters, and return types.</p>
+<p>Here is a simple example of using VuVoPy to compute speech parameters:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">VuVoPy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">vp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="c1"># Users should replace the file_path with their own file path</span>
+<span class="n">file_path</span> <span class="o">=</span> <span class="s2">&quot;signal.wav&quot;</span>
+<span class="n">durmad</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">durmad</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">winover</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span><span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;hamm&#39;</span><span class="p">)</span>
+<span class="n">durmed</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">durmed</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">winover</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span><span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;hamm&#39;</span><span class="p">)</span>
+<span class="n">duv</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">duv</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">winover</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span><span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;hamm&#39;</span><span class="p">)</span>
+<span class="n">hnr</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">hnr</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<span class="n">jitter</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">jitterPPQ</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<span class="n">mpt</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">mpt</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">winover</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span><span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;hamm&#39;</span><span class="p">)</span>
+<span class="n">ppr</span> <span class="o">=</span><span class="n">vp</span><span class="o">.</span><span class="n">ppr</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">winover</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span><span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;hamm&#39;</span><span class="p">)</span>
+<span class="n">relf0sd</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">relF0SD</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<span class="n">relf1sd</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">relF1SD</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">winover</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span><span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;hamm&#39;</span><span class="p">)</span>
+<span class="n">relf2sd</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">relF2SD</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<span class="n">relseosd</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">relSEOSD</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span><span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">winover</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span><span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;hamm&#39;</span><span class="p">)</span>
+<span class="n">shimmer</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">shimmerAPQ</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+<span class="n">spir</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">spir</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">winlen</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">winover</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span><span class="n">wintype</span><span class="o">=</span><span class="s1">&#39;hamm&#39;</span><span class="p">)</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;durmad&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">durmad</span><span class="p">],</span>
+    <span class="s2">&quot;durmed&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">durmed</span><span class="p">],</span>
+    <span class="s2">&quot;duv&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">duv</span><span class="p">],</span>
+    <span class="s2">&quot;hnr&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">hnr</span><span class="p">],</span>
+    <span class="s2">&quot;jitter&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">jitter</span><span class="p">],</span>
+    <span class="s2">&quot;mpt&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">mpt</span><span class="p">],</span>
+    <span class="s2">&quot;ppr&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ppr</span><span class="p">],</span>
+    <span class="s2">&quot;relf0sd&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">relf0sd</span><span class="p">],</span>
+    <span class="s2">&quot;relf1sd&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">relf1sd</span><span class="p">],</span>
+    <span class="s2">&quot;relf2sd&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">relf2sd</span><span class="p">],</span>
+    <span class="s2">&quot;relseosd&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">relseosd</span><span class="p">],</span>
+    <span class="s2">&quot;shimmer&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">shimmer</span><span class="p">],</span>
+    <span class="s2">&quot;spir&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">spir</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
