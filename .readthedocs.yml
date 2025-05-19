@@ -1,4 +1,3 @@
-# .readthedocs.yml
 version: 2
 
 build:
@@ -9,8 +8,7 @@ build:
 python:
   install:
     - method: pip
-      path: .  # Install VuVoPy using pyproject.toml or setup.py
-  system_packages: false
+      path: .
 
 sphinx:
   configuration: docs/source/conf.py
