@@ -9,6 +9,8 @@ Built for machine learning applications like Parkinson’s disease diagnosis.
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.8%2B-brightgreen.svg)
 ![Status](https://img.shields.io/badge/status-active-success.svg)
+[![Documentation Status](https://readthedocs.org/projects/vuvopy-documentation/badge/?version=latest)](https://vuvopy-documentation.readthedocs.io/en/latest/?badge=latest)
+
 
 ---
 
