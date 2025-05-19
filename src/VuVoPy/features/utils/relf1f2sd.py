@@ -6,24 +6,19 @@ from VuVoPy.data.utils.formant_frequencies import FormantFrequencies as ff
 
 def relF1SD(folder_path, winlen = 512, winover = 256, wintype = 'hann'):
     """
-    Computes the relative standard deviation of the first formant frequency (F1) 
-    from a voice sample.
+    Compute the relative standard deviation of the first formant frequency (F1).
 
-    Parameters:
-    -----------
-    folder_path : str
-        Path to the folder containing the voice sample in WAV format.
-    winlen : int, optional
-        Length of the analysis window in samples (default is 512).
-    winover : int, optional
-        Overlap between consecutive windows in samples (default is 256).
-    wintype : str, optional
-        Type of the window function to apply (default is 'hann').
+    This function segments a WAV audio sample, extracts the first formant (F1),
+    and returns its relative standard deviation (std / mean).
+
+    Args:
+        folder_path (str): Path to the voice sample (WAV).
+        winlen (int, optional): Length of the analysis window in samples. Default is 512.
+        winover (int, optional): Overlap between consecutive windows in samples. Default is 256.
+        wintype (str, optional): Type of window function to use. Default is 'hann'.
 
     Returns:
-    --------
-    float
-        The relative standard deviation of the first formant frequency (F1).
+        float: Relative standard deviation of the F1 frequency.
     """
     formant_freqs = ff.from_voice_sample(sg.from_voice_sample(pp.from_voice_sample(vs.from_wav(folder_path)),winlen, wintype ,winover)).get_formants_preem()[:,0]
     if  formant_freqs.size == 0:
@@ -36,30 +31,26 @@ def relF1SD(folder_path, winlen = 512, winover = 256, wintype = 'hann'):
 
 def relF2SD(folder_path, winlen = 512, winover = 256, wintype = 'hann'):
     """
-    Computes the relative standard deviation of the second formant frequency (F2) 
-    from a voice sample provided as a WAV file.
-    Parameters:
-    -----------
-    folder_path : str
-        The file path to the WAV file containing the voice sample.
-    winlen : int, optional
-        The length of the analysis window in samples. Default is 512.
-    winover : int, optional
-        The overlap between consecutive windows in samples. Default is 256.
-    wintype : str, optional
-        The type of window function to apply. Default is 'hann'.
+    Compute the relative standard deviation of the second formant frequency (F2).
+
+    This function processes a WAV voice sample, segments it using a windowing
+    approach, extracts F2 formants, and calculates the relative standard deviation
+    (std/mean) of the second formant frequency.
+
+    Args:
+        folder_path (str): Path to the WAV file.
+        winlen (int, optional): Window length in samples. Default is 512.
+        winover (int, optional): Overlap between windows in samples. Default is 256.
+        wintype (str, optional): Type of window function. Default is 'hann'.
+
     Returns:
-    --------
-    float
-        The relative standard deviation of the second formant frequency (F2), 
-        calculated as the mean of F2 divided by its standard deviation.
+        float: Relative standard deviation of F2 (std/mean).
+
     Notes:
-    ------
-    - This function relies on several external modules (`vs`, `pp`, `sg`, `ff`) 
-      tracting formant frequencies.
-    - Ensure that the input WAV file is valid and contains a proper voice sample 
-      for accurate results.
+        - Requires modules `vs`, `pp`, `sg`, `ff` for preprocessing and formant extraction.
+        - Input file must contain a valid speech sample for accurate results.
     """
+
 
     formant_freqs = ff.from_voice_sample(sg.from_voice_sample(pp.from_voice_sample(vs.from_wav(folder_path)),winlen, wintype ,winover)).get_formants_preem()[:,1]
 

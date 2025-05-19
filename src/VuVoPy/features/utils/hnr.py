@@ -7,16 +7,20 @@ def hnr(folder_path, winlen=512, winover=256 , wintype='hann', f0_min=75, f0_max
     """
     Compute Harmonics-to-Noise Ratio (HNR) using an autocorrelation-based method.
 
-    Parameters:
-    - folder_path: Path to the audio file  
-    - winlen: Frame length in samples
-    - winover: Overlap in samples
-    - wintype: Window type
-    - f0_min: Minimum fundamental frequency (Hz)
-    - f0_max: Maximum fundamental frequency (Hz)
+    This function processes a WAV file, divides it into overlapping frames, and estimates
+    the harmonic-to-noise ratio (HNR) for each frame using pitch period information
+    derived from the autocorrelation method.
+
+    Args:
+        folder_path (str): Path to the audio file (WAV format).
+        winlen (int): Frame length in samples.
+        winover (int): Overlap between consecutive frames in samples.
+        wintype (str): Type of window function to apply (e.g., 'hann', 'hamming').
+        f0_min (float): Minimum fundamental frequency in Hz.
+        f0_max (float): Maximum fundamental frequency in Hz.
 
     Returns:
-    - Mean HNR value across frames
+        float: Mean HNR value across all frames.
     """
 
     # Load and preprocess the audio file
