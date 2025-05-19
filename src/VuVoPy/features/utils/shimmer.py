@@ -8,35 +8,23 @@ from VuVoPy.data.containers.voiced_sample import VoicedSample as vos
 
 def shimmerAPQ(folder_path, n_points=5, plim=(30, 500), sTHR=0.5, winlen = 512, winover = 496 , wintype = 'hamm'):
     """
-    :param folder_path: Path to the .wav file.
-    :type folder_path: str
-    :param n_points: Number of points in the local averaging window (e.g., 3 for APQ3, 5 for APQ5).
-    :type n_points: int
-    :param plim: F0 pitch range in Hz.
-    :type plim: tuple
-    :param sTHR: Voicing threshold for F0 tracking.
-    :type sTHR: float
-    :param winlen: Window length for segmentation.
-    :type winlen: int
-    :param winover: Window overlap for segmentation.
-    :type winover: int
-    :param wintype: Window type for segmentation.
-    :type wintype: str
-    :returns: Shimmer APQ-N value.
-    :rtype: float
-    Calculate shimmer APQ-N: amplitude perturbation quotient over N-point window.
+    Calculate shimmer APQ-N: amplitude perturbation quotient over an N-point window.
+
+    This function estimates shimmer by analyzing cycle-to-cycle amplitude variations 
+    in voiced frames of an audio signal. The average absolute difference between local 
+    peak amplitudes is computed over a moving window of size `n_points`.
 
     Args:
-        folder_path (str): Path to .wav file.
-        n_points (int): Number of points in local averaging window (e.g., 3 for APQ3, 5 for APQ5).
-        plim (tuple): F0 pitch range (Hz).
+        folder_path (str): Path to the .wav file.
+        n_points (int): Number of points in the local averaging window (e.g., 3 for APQ3, 5 for APQ5).
+        plim (tuple): F0 pitch range in Hz. Default is (30, 500).
         sTHR (float): Voicing threshold for F0 tracking.
         winlen (int): Window length for segmentation.
         winover (int): Window overlap for segmentation.
         wintype (str): Window type for segmentation.
 
     Returns:
-        float: shimmer APQ-N value
+        float: Shimmer APQ-N value.
     """
     preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))
     segment = sg.from_voice_sample(preprocessed_sample, winlen, wintype, winover)

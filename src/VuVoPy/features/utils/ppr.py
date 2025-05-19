@@ -6,26 +6,25 @@ from VuVoPy.data.utils.vuvs_detection import Vuvs as vuvs
 
 def ppr(folder_path, winlen = 512, winover = 496 , wintype = 'hamm', min_silence_duration_ms= 100):
     """
-    This function processes an audio file to determine the proportion of silence in the signal. 
-    It uses a windowing approach to segment the audio and applies voice activity detection 
-    to classify segments as silent or non-silent.
-    - folder_path : str
-        Path to the audio file.
-    - winlen : int, optional, default=512
-        Length of the window for segmentation.
-    - winover : int, optional, default=496
-        Overlap between consecutive windows.
-    - wintype : str, optional, default='hamm'
-        Type of windowing function ('hann', 'hamm', 'blackman', 'square').
-    - float
-        Percentage of silence in the audio signal.
-    Notes:
-    - The function relies on external modules for preprocessing, segmentation, and voice activity detection.
-    - Ensure the input audio file is in a compatible format (e.g., WAV).
-    - The accuracy of the silence percentage depends on the quality of the voice activity detection algorithm.
-    
+    Compute the percentage of silence in an audio file using voice activity detection.
+
+    This function loads and preprocesses an audio file, segments it using a specified windowing 
+    approach, and applies a voiced/unvoiced/silence detection algorithm to estimate 
+    the percentage of silence.
+
+    Args:
+        folder_path (str): Path to the audio file (e.g., WAV format).
+        winlen (int, optional): Window length for segmentation. Defaults to 512.
+        winover (int, optional): Overlap between consecutive windows. Defaults to 496.
+        wintype (str, optional): Window type ('hann', 'hamm', 'blackman', 'square'). Defaults to 'hamm'.
+        min_silence_duration_ms (int, optional): Minimum duration of silence to count, in milliseconds. Defaults to 100.
+
     Returns:
-    - float : Percentage of silence in the audio signal.
+        float: Percentage of silence in the audio signal.
+
+    Notes:
+        - Ensure the input file is in a compatible format (e.g., mono WAV).
+        - The silence detection accuracy depends on the quality of preprocessing and the VAD algorithm.
     """
     # Load and preprocess the audio sample
     preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))

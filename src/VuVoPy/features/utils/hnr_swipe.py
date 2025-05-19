@@ -7,36 +7,26 @@ from VuVoPy.data.utils.fundamental_frequency import FundamentalFrequency as ff
 def hnr(folder_path, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1, sTHR=-np.inf):
     """
     Compute the Harmonics-to-Noise Ratio (HNR) of an audio signal.
-    HNR is a measure of the ratio of harmonic sound to noise in a signal, 
-    often used in speech analysis to assess voice quality.
-    Parameters:
-    -----------
-    folder_path : str
-        Path to the audio file in WAV format.
-    plim : tuple, optional
-        Pitch range limits in Hz (default is (30, 500)).
-    hop_size : int, optional
-        Hop size for analysis in samples (default is 512).
-    dlog2p : float, optional
-        Logarithmic pitch step size (default is 1/96).
-    dERBs : float, optional
-        Step size in Equivalent Rectangular Bandwidths (default is 0.1).
-    sTHR : float, optional
-        Silence threshold in dB (default is -np.inf).
+
+    HNR is a ratio of periodic (harmonic) to aperiodic (noise) energy in a signal,
+    widely used in speech signal analysis to assess voice quality.
+
+    Args:
+        folder_path (str): Path to the audio file in WAV format.
+        plim (tuple, optional): Pitch range limits in Hz. Default is (30, 500).
+        hop_size (int, optional): Hop size for analysis. Default is 512.
+        dlog2p (float, optional): Logarithmic pitch step size. Default is 1/96.
+        dERBs (float, optional): Step size in ERB scale. Default is 0.1.
+        sTHR (float, optional): Silence threshold in dB. Default is -np.inf.
+
     Returns:
-    --------
-    float
-        The average HNR value of the audio signal. Returns NaN if no valid 
-        HNR values are computed.
+        float: Mean HNR value. Returns NaN if no valid values are found.
+
     Notes:
-    ------
-    - The function preprocesses the audio signal and computes the fundamental 
-      frequency using a pitch estimation algorithm.
-    - HNR is calculated for each valid fundamental frequency value and averaged 
-      across the signal.
-    - Values below 40 Hz or invalid frequencies (e.g., NaN or non-positive) 
-      are excluded from the computation.
+        - Signal is preprocessed and pitch-tracked before HNR estimation.
+        - Frames with invalid or low-frequency F0 are excluded.
     """
+
 
     # Load and preprocess the audio file
     voice_sample = vs.from_wav(folder_path)

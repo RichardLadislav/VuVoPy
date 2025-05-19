@@ -7,21 +7,19 @@ def spir(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
     """
     Calculate the percentage of silence in an audio signal using a windowing approach.
 
-    Parameters:
-    - folder_path : str
-        Path to the folder containing the audio file in WAV format.
-    - winlen : int, optional
-        Length of the analysis window (default is 512).
-    - winover : int, optional
-        Overlap between consecutive windows (default is 496).
-    - wintype : str, optional
-        Type of windowing function to apply. Options are:
-        'hann', 'hamm', 'blackman', 'square' (default is 'hamm').
+    This function segments the signal using a specified window type and size, detects
+    silent segments, and returns the ratio of silence duration to the total duration
+    as a percentage.
+
+    Args:
+        folder_path (str): Path to the WAV audio file.
+        winlen (int, optional): Window length for segmentation. Default is 512.
+        winover (int, optional): Overlap between consecutive windows. Default is 496.
+        wintype (str, optional): Type of window function to use. Options are:
+            'hann', 'hamm', 'blackman', 'square'. Default is 'hamm'.
 
     Returns:
-    - float
-        The percentage of silence in the audio signal, calculated as the ratio
-        of silent segments to the total duration of the signal.
+        float: Percentage of silence in the signal.
     """
     
     preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))
