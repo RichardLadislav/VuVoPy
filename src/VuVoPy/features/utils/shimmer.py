@@ -73,11 +73,3 @@ def shimmerAPQ(folder_path, n_points=5, plim=(30, 500), sTHR=0.5, winlen = 512, 
 
     shimmer_vals = np.abs(trimmed - smoothed) / global_mean_amp
     return np.mean(shimmer_vals) if len(shimmer_vals) else 0
-
-def main():
-    #folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//PARCZ_complet//recordings//K1021//K1021_8.2-1_1.wav"
-    out = shimmerAPQ(folder_path, n_points=3, sTHR=0.5)
-    print(out)
-if __name__ == "__main__": 
-    main()

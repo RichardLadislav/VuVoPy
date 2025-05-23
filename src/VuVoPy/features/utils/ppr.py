@@ -35,11 +35,3 @@ def ppr(folder_path, winlen = 512, winover = 496 , wintype = 'hamm', min_silence
     labels = vuvs(segment, fs=fs, winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
     
     return labels.get_total_silence_duration(min_silence_duration_ms=min_silence_duration_ms) / (len(preprocessed_sample.get_waveform())/fs) * 100
-
-def main():
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
-    out = ppr(folder_path)
-    print(out)
-
-if __name__ == "__main__":
-    main()

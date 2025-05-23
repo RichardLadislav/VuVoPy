@@ -145,32 +145,3 @@ class VoicedSample(vs):
         """
         return self.fs
     
-def main():
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
-    preprocessed_sample = pp.from_voice_sample(vs.from_wav(folder_path))
-    segment = sg.from_voice_sample(preprocessed_sample, winlen=512, winover=496, wintype='hamm')
-    fs = segment.get_sampling_rate()
-    
-    labels = vuvs(segment, fs=fs, winlen=segment.get_window_length(), winover=segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5)
-    voiced_sample = VoicedSample(preprocessed_sample,labels,fs).get_voiced_sample()
-    silence_removed_sample = VoicedSample(preprocessed_sample, labels, fs).get_silence_remove_sample()
-    voiced_sample = VoicedSample(preprocessed_sample, labels, fs).get_voiced_sample()
-    stretched_labels = VoicedSample(preprocessed_sample, labels, fs).label_stretch()
-    #    Plotting the results
-    #plt.figure(figsize=(12, 6))
-    #plt.plot(stretched_labels, label='stretched labels')
-    #plt.plot(labels.get_vuvs(), label='origianl labels')
-
-    plt.subplot(3, 1, 1)
-    plt.plot(preprocessed_sample.get_waveform(), label='Original signal',color='blue')
-    plt.legend(loc='upper right')
-    plt.subplot(3, 1, 2)
-    plt.plot(voiced_sample, label="Voiced sigal", color='orange')
-    plt.legend(loc='upper right')
-    plt.subplot(3, 1, 3)
-    plt.plot(silence_removed_sample, label='Silence removed signal', color='green')
-    plt.legend(loc='upper right')
-    print("done done doneeee")
-    plt.show(block=True)
-if __name__ == "__main__":
-    main()

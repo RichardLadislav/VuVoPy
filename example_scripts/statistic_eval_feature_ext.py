@@ -32,9 +32,9 @@ from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
 from tqdm import tqdm
 
 # ===== User Configuration =====
-WAV_DIR    = r"C:/Users/Richard Ladislav/Desktop/final countdown/DP-knihovna pro parametrizaci reci - kod/supershort_database"
+WAV_DIR    = r"user_wav_dir_path"  
 #WAV_DIR    = r"C:/Users/Richard Ladislav/Desktop/final countdown/DP-knihovna pro parametrizaci reci - kod/PARCZ_complet"
-OUTPUT_CSV = r"C:/Users/Richard Ladislav/Desktop/final countdown/DP-knihovna pro parametrizaci reci - kod/statistics_VuVoPy/parcz_features.csv"
+OUTPUT_CSV = r"user_output_csv_path"
 # Number of worker threads
 N_WORKERS  = min(os.cpu_count() or 1, 8)
 # Timeout per file (seconds)

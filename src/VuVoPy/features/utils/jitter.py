@@ -44,10 +44,3 @@ def jitterPPQ(folder_path, n_points = 3, plim=(30, 500), hop_size = 512, dlog2p=
         jitter_values.append(deviation)
 
     return float(np.mean(jitter_values))
-
-def main():
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
-    out = jitterPPQ(folder_path, n_points=3, sTHR= 0.5)
-    print(out)
-if __name__ == "__main__": 
-    main()

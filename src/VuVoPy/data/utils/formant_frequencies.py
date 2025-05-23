@@ -126,34 +126,3 @@ class FormantFrequencies(Segmented):
     def get_sampling_rate(self):
         """Return the sampling rate."""
         return self.fs
-
-def main():
-    #folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//short_test_database//recordings//K1021//K1021_7.1-3-a_1.wav"
-    processed_sample = Preprocessed.from_voice_sample(VoiceSample.from_wav(folder_path))
-
-    seg = Segmented.from_voice_sample(processed_sample, winlen=512, winover=256, wintype="hann")
-    formants = FormantFrequencies.from_voice_sample(seg)
-    formants_x = formants.get_formants()
-    formants_preem = formants.get_formants_preem()
-    formants_xnormm = formants.get_formants_norm()
-    # Apply different windowing functions dynamically
-    #seg_wave = seg.get_segment(winlen=512, wintype="hann", winover=256)
-    #seg_preem = seg.get_preem_segment(winlen=512, wintype="blackman", winover=256)
-    #seg_norm = seg.get_norm_segment(winlen=512, wintype="square", winover=256)
-    dt = formants_preem.shape[0] / formants.get_sampling_rate() # Time step for analysis (seconds)
-    # Time vector for each window
-    time_vector = np.arange(0, len(formants_preem) * dt, dt)[:formants_preem.shape[0]]
-    plt.figure(figsize=(10, 6))
-    for i in range(formants_xnormm.shape[1]):  # Iterate over formant frequency columns
-        plt.scatter(time_vector,formants_x[:, i], label=f'Formant {i}',marker="x")
-
-    plt.title("Formant Frequencies Over Time")
-    plt.xlabel("Time (s)")
-    plt.ylabel("Frequency (Hz)")
-    plt.legend()
-    plt.grid()
-    plt.show(block=True) 
-    print("holap")
-if __name__ == "__main__": 
-    main()

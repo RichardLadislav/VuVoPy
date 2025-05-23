@@ -70,12 +70,3 @@ def hnr_fft(folder_path, winlen=1608, winover=804, wintype='hann', f0_min=75, f0
             hnr_values.append(hnr)
 
     return np.mean(hnr_values) if hnr_values else float('nan')
-
-if __name__ == "__main__":
-    file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//sine_wave_with_noise.wav"
-    # Compute HNR
-    hnr_value = hnr_fft(file_path)
-    if np.isnan(hnr_value):
-        print("Could not compute HNR.")
-    else:
-        print(f"Mean HNR: {hnr_value:.2f} dB")

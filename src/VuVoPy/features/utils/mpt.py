@@ -25,13 +25,3 @@ def mpt(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
     lables = vuvs(segment, fs=fs, winlen =segment.get_window_length(), winover = segment.get_window_overlap(), wintype=segment.get_window_type(), smoothing_window=5).get_vuvs()
 
     return (np.sum(lables==2)*hop_size)/fs
-
-def main():
-    folder_path = "file_path_here"
-    out = mpt(folder_path)
-    print(out)
-
-if __name__ == "__main__": 
-    main()
-    
-    

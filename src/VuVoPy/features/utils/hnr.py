@@ -62,13 +62,3 @@ def hnr(folder_path, winlen=512, winover=256 , wintype='hann', f0_min=75, f0_max
         hnr_values.append(hnr)
 
     return np.mean(hnr_values) if hnr_values else float('nan')
-
-if __name__ == "__main__":
-    file_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//recordings-20250306T192251Z-001//recordings//K1020//K1020_7.1-1-a_1.wav"
-    
-    # Compute HNR
-    hnr_value = hnr(file_path)
-    if np.isnan(hnr_value):
-        print("Could not compute HNR.")
-    else:
-        print(f"Mean HNR: {hnr_value:.2f} dB")

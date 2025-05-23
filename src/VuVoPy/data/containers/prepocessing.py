@@ -66,26 +66,3 @@ class Preprocessed(VoiceSample):
     def get_sampling_rate(self):
         """Return the sampling rate."""
         return self.fs
-def main():
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
-    processed_sample = Preprocessed.from_voice_sample(VoiceSample.from_wav(folder_path))
-
-#    Get processed versions
-    preemphasized = processed_sample.get_preemphasis()
-    normalized = processed_sample.get_normalization()
-    original = processed_sample.get_waveform()  
-    sampling_rate = processed_sample.get_sampling_rate()
-
-    print(sampling_rate)
-    plt.subplot(3, 1, 1)
-    plt.plot(original, label="Original", color='blue')
-    plt.legend()
-    plt.subplot(3, 1, 2)
-    plt.plot(normalized, label="Normalized", color='orange')
-    plt.legend()
-    plt.subplot(3, 1, 3)
-    plt.plot(preemphasized, label="Pre-emphasized",color='green')
-    plt.legend()
-    plt.show(block=True)
-if __name__ == "__main__": 
-    main()
