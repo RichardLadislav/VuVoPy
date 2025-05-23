@@ -61,12 +61,3 @@ def relF2SD(folder_path, winlen = 512, winover = 256, wintype = 'hann'):
         return float('nan')
     mu  = np.mean(formant_freqs)
     return mu / sigma
-
-def main():
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
-    out = relF1SD(folder_path, wintype="hamm")
-    out1 = relF2SD(folder_path)
-    print(out)
-    print(out1)
-if __name__ == "__main__": 
-    main()

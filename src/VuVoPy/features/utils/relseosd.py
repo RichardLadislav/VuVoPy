@@ -41,10 +41,3 @@ def relSEOSD(folder_path, winlen = 512, winover = 496 , wintype = 'hamm'):
 
     return std_val / mean_val if mean_val != 0 else 0
     
-def main():
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//activity_unproductive.wav"
-    out = relSEOSD(folder_path)
-    print(f"Relative standard deviation of RMS energy contour: {out}")
-
-if __name__ == "__main__":
-    main()

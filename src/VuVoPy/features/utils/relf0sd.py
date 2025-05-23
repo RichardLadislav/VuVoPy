@@ -33,9 +33,3 @@ def relF0SD(folder_path, plim=(30, 500), hop_size = 512, dlog2p=1/96, dERBs=0.1,
         return float('nan')
     mu  = np.mean(fundamental_freq)
     return mu / sigma
-def main():
-    folder_path = "C://Users//Richard Ladislav//Desktop//final countdown//DP-knihovna pro parametrizaci reci - kod//concept_algorithms_zaloha//vowel_e_test.wav"
-    out = relF0SD(folder_path)
-    print(out)
-if __name__ == "__main__": 
-    main()
